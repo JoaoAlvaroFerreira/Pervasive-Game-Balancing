@@ -1,7 +1,8 @@
 import sqlite3
-from View.gui import screen
 from Model.player import Player
-import Controller.PlayerSimulation
+from Controller.PlayerSimulation import *
+import requests
+import names
 from sqlite3 import Error
 
 def create_connection(path):
@@ -40,7 +41,6 @@ def print_all_players(conn):
         print("Name: ",row[1])
     
     print ("The End")
-
     
 
     
@@ -48,14 +48,17 @@ def print_all_players(conn):
 
 
 if __name__ == '__main__':
-    p = Player("Joao")
-    print(p.name)
+
     connection = create_connection(".\Databases\games.db")
     create_tables(connection)
     insert_game(connection)
-    p.insert_into_db(connection)
     print_all_players(connection)
-    screen()
+    #screen()
+    
+    generatePlayer()
+    generatePlayer()
+    generatePlayer()
+    generatePlayer()
   
     #generate_players
     #add to db
