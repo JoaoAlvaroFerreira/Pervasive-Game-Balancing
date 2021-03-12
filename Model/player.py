@@ -1,5 +1,5 @@
 class Player:
-    name = ""
+    name = "aaaaaa"
 
     def __init__(self, name):
         self.name = name
@@ -43,3 +43,17 @@ class PlayerLocationInfo:
         self.longitude = longitude
         self.city = city
         self.typicalWeather
+
+class Faction:
+    def __init__(self,name):
+        self.name = name
+
+class FactionMember:
+    def __init__(self,player, faction):
+        self.player = player
+        self.faction = faction
+
+class PlayerConnection:
+    def __init__(self,player1, player2):
+        self.player1 = player1
+        self.player2 = player2

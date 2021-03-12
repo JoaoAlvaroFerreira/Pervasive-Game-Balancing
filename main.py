@@ -52,7 +52,7 @@ if __name__ == '__main__':
     connection = create_connection(".\Databases\games.db")
     create_tables(connection)
     insert_game(connection)
-    print_all_players(connection)
+    #print_all_players(connection)
     #screen()
     
     generatePlayer()

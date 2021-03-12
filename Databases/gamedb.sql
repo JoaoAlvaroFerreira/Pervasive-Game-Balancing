@@ -1,5 +1,4 @@
 DROP TABLE IF EXISTS Player;
-DROP TABLE IF EXISTS Personality;
 DROP TABLE IF EXISTS Demographic;
 DROP TABLE IF EXISTS PlayerLocationInfo;
 DROP TABLE IF EXISTS GameplayMoments; --to do
@@ -46,6 +45,7 @@ CREATE TABLE IF NOT EXISTS Challenge (
 	name text NOT NULL,
 	TimeRestraint boolean NOT NULL,
 	SpaceRestraint boolean NOT NULL,
+	Multiplayer boolean NOT NULL,
 	FOREIGN KEY (ChallengeTypeID) REFERENCES ChallengeType (id)
 );
 
@@ -59,7 +59,6 @@ CREATE TABLE IF NOT EXISTS ChallengeInstance (
 	completed boolean NOT NULL,
 	playerID int NOT NULL,
 	playerID2 int,
-	PvP boolean not null,
 	FOREIGN KEY (playerID) REFERENCES Player (id),
 	FOREIGN KEY (ChallengeID) REFERENCES Challenge (id)
 );
@@ -122,28 +121,16 @@ CREATE TABLE IF NOT EXISTS Inventory(
 
 CREATE TABLE IF NOT EXISTS Wallet(
 	playerID int NOT NULL,
-	gameObjectInstanceID int NOT NULL,
-	FOREIGN KEY (gameObjectInstanceID) REFERENCES GameObjectInstance (id),
+	CurrencyID int NOT NULL,
+	FOREIGN KEY (CurrencyID) REFERENCES Currency (id),
 	FOREIGN KEY (playerID) REFERENCES Player (id)
 );
 
 CREATE TABLE IF NOT EXISTS Player(
 	id SERIAL PRIMARY KEY,
-	name text NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS Personality(
-	playerID int PRIMARY KEY,
-	Concentration int NOT NULL,
-	Competitiveness int NOT NULL,
-	PlayerSkills int NOT NULL,
-	UserControl int NOT NULL,
-	ClearGoals int NOT NULL,
-	Feedback int NOT NULL,
-	Immersion int NOT NULL,
-	SocialInteraction int NOT NULL,
-	PersonalityType text NOT NULL,
-	FOREIGN KEY (playerID) REFERENCES Player (id)
+	gameID int,
+	name text NOT NULL,
+	FOREIGN KEY (gameID) REFERENCES Game (id)
 );
 
 CREATE TABLE IF NOT EXISTS Demographic(
