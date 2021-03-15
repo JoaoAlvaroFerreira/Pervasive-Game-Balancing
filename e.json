@@ -1,0 +1,44 @@
+{
+    "data": [
+        {
+            "alias": "pic",
+            "name": "Individual countries"
+        },
+        {
+            "alias": "pop_continent",
+            "name": "Whole Continent"
+        },
+        {
+            "alias": "wpgp",
+            "name": "Unconstrained individual countries 2000-2020 ( 100m resolution )"
+        },
+        {
+            "alias": "wpgp1km",
+            "name": "Unconstrained global mosaics 2000-2020 ( 1km resolution )"
+        },
+        {
+            "alias": "",
+            "name": "WP00643"
+        },
+        {
+            "alias": "wpgpunadj",
+            "name": "Unconstrained individual countries 2000-2020 UN adjusted ( 100m resolution )"
+        },
+        {
+            "alias": "wpic1km",
+            "name": "Unconstrained individual countries 2000-2020  ( 1km resolution )"
+        },
+        {
+            "alias": "wpicuadj1km",
+            "name": "Unconstrained individual countries 2000-2020 UN adjusted ( 1km resolution )"
+        },
+        {
+            "alias": "cic2020_100m",
+            "name": "Constrained Individual countries 2020 ( 100m resolution )"
+        },
+        {
+            "alias": "cic2020_UNadj_100m",
+            "name": "Constrained Individual countries 2020 UN adjusted  (100m resolution)"
+        }
+    ]
+}

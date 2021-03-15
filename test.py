@@ -1,6 +1,9 @@
-# Import Libraries
-import pandas as pd
-from arcgis.gis import GIS
-from arcgis.geoenrichment import Country
+import rasterio
+from rasterio.plot import show
 
-usa = Country.get('US')
+raster_url = "Resources/Geotiff Files/France.tif"
+
+
+
+img = rasterio.open(raster_url)
+show(img)

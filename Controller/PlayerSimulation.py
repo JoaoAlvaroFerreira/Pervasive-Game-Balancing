@@ -7,6 +7,7 @@ import random
 import pandas as pd
 import overpy
 import country_converter as coco
+import pathlib
 
 
 def generateDemo(player):
@@ -44,14 +45,21 @@ def generateDemo(player):
         for node in result.nodes:
             print("Name: %s" % node.tags.get("name", "n/a"))
            
-        print("BBBBBBBBB")
-        print(country_df)
-        country_code = coco.convert(names=r['address']['country'], to='ISO3')
+  
+       
         #worldpopapi
 
-        url= "https://www.worldpop.org/rest/data/pop/wpgp?iso3={}".format(country_code)
-        response = requests.request("GET", url)
-        print(response.text)
+        if not pathlib.Path("Resources/Geotiff Files/"+r['address']['country']+".tif").exists():           
+
+            country_code = coco.convert(names=r['address']['country'], to='ISO3')
+            url= "https://www.worldpop.org/rest/data/pop/wpgp?iso3={}".format(country_code)
+            response = requests.request("GET", url)
+            data = json.loads(response.text)
+            url_download = data['data'][len(data['data'])-1]['files'][0]
+            tif = requests.get(url_download, allow_redirects=True)
+            open("Resources/Geotiff Files/"+r['address']['country']+".tif", 'wb').write(tif.content)
+
+        
 
 
     #player.Demographic = 
