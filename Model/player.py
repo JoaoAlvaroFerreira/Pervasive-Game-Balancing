@@ -19,8 +19,8 @@ class Player:
         conn.commit()
         return cur.lastrowid
 
-class Personality: #0-10
-    def __init__(self, Concentration,Competitiveness,PlayerSkills,UserControl,ClearGoals,Feedback,Immersion,SocialInteraction,PersonalityType):
+class Personality: #0-5
+    def __init__(self, Concentration,Competitiveness,PlayerSkills,UserControl,ClearGoals,Feedback,Immersion,SocialInteraction,Free2Play, PersonalityType):
         self.Concentration = Concentration
         self.Competitiveness = Competitiveness
         self.PlayerSkills = PlayerSkills
@@ -29,6 +29,7 @@ class Personality: #0-10
         self.Feedback = Feedback
         self.Immersion = Immersion
         self.SocialInteraction = SocialInteraction
+        self.Free2Play = Free2Play
         self.PersonalityType = PersonalityType
 
 class Demographic:

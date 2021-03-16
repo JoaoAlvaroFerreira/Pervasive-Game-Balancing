@@ -1,6 +1,6 @@
 import sqlite3
 from Model.player import Player
-from Controller.PlayerSimulation import *
+from Controller.PlayerGeneration import *
 import requests
 import names
 from sqlite3 import Error
