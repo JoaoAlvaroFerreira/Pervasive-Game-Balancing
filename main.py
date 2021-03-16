@@ -49,18 +49,15 @@ def print_all_players(conn):
 
 if __name__ == '__main__':
 
-    connection = create_connection(".\Databases\games.db")
-    create_tables(connection)
-    insert_game(connection)
+    #connection = create_connection(".\Databases\games.db")
+    #create_tables(connection)
+    #insert_game(connection)
     #print_all_players(connection)
     #screen()
     
     generatePlayer()
-    generatePlayer()
-    generatePlayer()
-    generatePlayer()
+   
   
-    #generate_players
     #add to db
 
     #normal use cycle

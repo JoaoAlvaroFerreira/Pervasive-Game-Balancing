@@ -1,5 +1,6 @@
 class Player:
     name = "aaaaaa"
+    demographic = "aaaaa"
 
     def __init__(self, name):
         self.name = name
@@ -31,10 +32,9 @@ class Personality: #0-10
         self.PersonalityType = PersonalityType
 
 class Demographic:
-    def __init__(self,Age,Education, Ethnicity, SocioEconomicStatus):
+    def __init__(self,Age, Gender, SocioEconomicStatus):
         self.Age = Age
-        self.Education = Education
-        self.Ethnicity = Ethnicity
+        self.Gender = Gender
         self.SocioEconomicStatus = SocioEconomicStatus
 
 class PlayerLocationInfo:
