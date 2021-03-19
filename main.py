@@ -1,6 +1,6 @@
 import sqlite3
 from Model.player import Player
-from Controller.PlayerGeneration import *
+from Controller.GameManagement import *
 import requests
 import names
 from sqlite3 import Error
@@ -54,8 +54,8 @@ if __name__ == '__main__':
     #insert_game(connection)
     #print_all_players(connection)
     #screen()
+    game = GameManagement()
     
-    generatePlayer()
    
   
     #add to db

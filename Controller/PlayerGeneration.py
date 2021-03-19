@@ -69,7 +69,11 @@ def generateDemo(player):
         print(age)
         print(gender)
         print(wealth)
-        return Demographic(age, gender, wealth)
+        
+        player.PlayerLocationInfo = PlayerLocationInfo(latitude, longitude, r['address']['city'])
+        player.Demographic = Demographic(age, gender, wealth)
+
+        return player
          
 def generatePersonality(demo):
     #balanced, competitive, relaxed
@@ -102,6 +106,8 @@ def generatePersonality(demo):
 def generatePlayer():
     player = Player(names.get_full_name())
     print("Name: "+player.name)
-    player.demographic = generateDemo(player)
-    player.personality = generatePersonality(player.demographic)
+    player = generateDemo(player)
+    player.personality = generatePersonality(player.Demographic)
+
+    return player
     

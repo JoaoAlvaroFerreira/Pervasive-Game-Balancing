@@ -19,6 +19,9 @@ class Player:
         conn.commit()
         return cur.lastrowid
 
+    def printThing(self):
+        print("aaaaaaaaaaa")
+
 class Personality: #0-5
     def __init__(self, Concentration,Competitiveness,PlayerSkills,UserControl,ClearGoals,Feedback,Immersion,SocialInteraction,Free2Play, PersonalityType):
         self.Concentration = Concentration
@@ -39,11 +42,10 @@ class Demographic:
         self.SocioEconomicStatus = SocioEconomicStatus
 
 class PlayerLocationInfo:
-    def __init__(self,latitude,longitude,city,typicalWeather):
+    def __init__(self,latitude,longitude,city):
         self.latitude = latitude
         self.longitude = longitude
         self.city = city
-        self.typicalWeather
 
 class Faction:
     def __init__(self,name):
