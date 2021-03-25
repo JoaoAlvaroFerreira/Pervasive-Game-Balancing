@@ -4,6 +4,7 @@ from Controller.GameManagement import *
 import requests
 import names
 from sqlite3 import Error
+import sys
 
 def create_connection(path):
     connection = None
@@ -54,7 +55,42 @@ if __name__ == '__main__':
     #insert_game(connection)
     #print_all_players(connection)
     #screen()
-    game = GameManagement()
+
+    if len(sys.argv) < 2:
+        print("Use python ./main <create|sim|analyse>")
+        exit()
+
+    if sys.argv[1] == "create":
+        game = GameManagement()
+        connection = create_connection(".\Databases\games.db")
+        create_tables(connection)
+        insert_game(connection)
+        game.create(connection)
+
+    elif sys.argv[1] == "sim":
+        game = GameManagement()
+        connection = create_connection(".\Databases\games.db")
+        game.load(connection)
+
+    elif sys.argv[1] == "analyse":
+
+       connection = create_connection(".\Databases\games.db")
+       create_tables(connection)
+       insert_game(connection)
+       a = Player("Joao")
+       a.PlayerLocationInfo = PlayerLocationInfo(50,40,"Portugal")
+      
+      
+
+       a.insert_player(connection)
+       print(a.PlayerLocationInfo.country)
+ 
+       print_all_players(connection)
+    
+    else: print("Use python ./main <create|sim|analyse>")
+
+
+    
     
    
   

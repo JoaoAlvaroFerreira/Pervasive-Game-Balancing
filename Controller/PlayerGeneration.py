@@ -12,24 +12,12 @@ import Resources.API as local_api
 import Resources.utils as utils
 
 
-def generateDemo(player):
+def generateDemo(player, latitude, longitude, r ):
 
 
     df = pd.read_csv('Resources/quality_of_life.csv')
     
-   ##iberian peninsula
-    latitude = random.uniform(36,43.8)
-    print("Latitude:")
-    print(latitude)
-    longitude = random.uniform(-9.6,3.2)
-    print("Longitude:")
-    print(longitude)
-    querystring = """https://nominatim.openstreetmap.org/reverse?format=json&lat={}&lon={}&zoom=18&addressdetails=14&accept-language=en
-    """.format(latitude,longitude)
-    response = requests.request("GET", querystring)
 
-    r = json.loads(response.text)
-    print(r)
 
     
     if 'address' in r and r['address']['country']!= "France":
@@ -70,10 +58,8 @@ def generateDemo(player):
         print(gender)
         print(wealth)
         
-        player.PlayerLocationInfo = PlayerLocationInfo(latitude, longitude, r['address']['city'])
-        player.Demographic = Demographic(age, gender, wealth)
-
-        return player
+        
+        return Demographic(age, gender, wealth) 
          
 def generatePersonality(demo):
     #balanced, competitive, relaxed
@@ -87,9 +73,9 @@ def generatePersonality(demo):
     elif rand_var == 2:
         PersonalityType = "Relaxed"
     elif rand_var == 3:
-        if age == "Youth" or age == "Kid":
+        if demo.Age == "Youth" or demo.Age == "Kid":
             PersonalityType = "Competitive"
-        elif age == "Elderly":
+        elif demo.Age == "Elderly":
             PersonalityType = "Relaxed"
         else: PersonalityType = "Balanced"
 
@@ -103,11 +89,37 @@ def generatePersonality(demo):
      return Personality(random.randint(1,3), random.randint(1,3), random.randint(1,4), random.randint(2,4), random.randint(3,5), random.randint(3,5), random.randint(4,5), random.randint(4,5), random.randint(1,3), "Relaxed")
 
 
-def generatePlayer():
-    player = Player(names.get_full_name())
-    print("Name: "+player.name)
-    player = generateDemo(player)
-    player.personality = generatePersonality(player.Demographic)
 
-    return player
+
+
+
+def generatePlayer():
+
+    player_batch = []
+     ##iberian peninsula
+    latitude = random.uniform(36,43.8)
+    print("Latitude:")
+    print(latitude)
+    longitude = random.uniform(-9.6,3.2)
+    print("Longitude:")
+    print(longitude)
+    querystring = """https://nominatim.openstreetmap.org/reverse?format=json&lat={}&lon={}&zoom=18&addressdetails=14&accept-language=en
+    """.format(latitude,longitude)
+    response = requests.request("GET", querystring)
+    
+    r = json.loads(response.text)
+
+    for _ in range(0,1):
+    
+        player = Player(names.get_full_name())
+
+        rand_mod_a = random.uniform(-0.2,0.2)
+        rand_mod_b  = random.uniform(-0.2,0.2)
+        player.PlayerLocationInfo = PlayerLocationInfo(latitude+rand_mod_a, longitude+rand_mod_b, r['address']['country'])
+        player.Demographic = generateDemo(player, latitude+rand_mod_a, longitude+rand_mod_b, r)
+        
+        player.Personality = generatePersonality(player.Demographic)
+        player_batch.append(player)
+
+    return player_batch
     
