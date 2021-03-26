@@ -70,7 +70,8 @@ if __name__ == '__main__':
     elif sys.argv[1] == "sim":
         game = GameManagement()
         connection = create_connection(".\Databases\games.db")
-        game.load(connection)
+        game.sim(connection)
+        
 
     elif sys.argv[1] == "analyse":
 

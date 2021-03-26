@@ -38,6 +38,7 @@ class GameManagement:
         
         for ch in self.challenges:
             ch.insert_into_db(conn)
+
         
       
 
@@ -45,7 +46,7 @@ class GameManagement:
     
     def load(self, conn):
         self.players = []
-        
+        self.gameplay_moments = []
         #self.load_moments(conn)
 
         cur = conn.execute(''' SELECT id, name from Player''' )
@@ -53,15 +54,27 @@ class GameManagement:
             new_p = Player(row[1])
             new_p.load_player(conn,row[0])
             self.players.append(new_p)
+            sql = ''' SELECT id, latitude, longitude, play_timestamp FROM PlayMoment WHERE playerID == {} '''.format(row[0])
+            cur2 = conn.execute(sql)
+            for row2 in cur2:
+                new_gm = PlayMoment(cur2[1],cur2[2],cur2[3])
+                self.gameplay_moments.append(new_gm)
 
+        
+    
         self.load_game_objects(conn)
 
         self.load_challenges(conn)
             
+       
+    def sim(self, conn):
+        self.load(conn)
+
         for player in self.players:
-            print("Age:"+player.Demographic.Age)
-            print("Country:"+player.PlayerLocationInfo.country)
-            print("Personality:"+player.Personality.PersonalityType)
+            total_play(player)
+        
+        for gm in self.gameplay_moments:
+            gm.insert_into_db()
 
 
     def load_game_objects(self, conn):
@@ -73,7 +86,7 @@ class GameManagement:
             new_got = GameObjectType(self,row[1], row[2])
             query = ''' SELECT id, name, keyItem from GameObject WHERE gameObjectTypeID =={}''' .format(row[0])
             cur2 = conn.execute(query)
-            gameObjectTypes.append(new_got)
+            self.gameObjectTypes.append(new_got)
             for row2 in cur2:
                 new_go = GameObject(new_got, row2[1], row2[2])
                 self.gameObjects.append(new_go)
@@ -86,14 +99,18 @@ class GameManagement:
 
         for row in cur:
             new_cht = ChallengeType(self,row[1], row[2], row[3],row[4], row[5])
-            query = ''' SELECT id, name, startDateAvailable, endDateAvailable, radiusLocationAvailable, radiusLocationVisible, latitude, longitude, itemReward, Multiplayer WHERE ChallengeTypeID =={}''' .format(row[0])
+            query = ''' SELECT id, name, startDateAvailable, endDateAvailable, radiusLocationAvailable, radiusLocationVisible, latitude, longitude, itemReward, Multiplayer From Challenge WHERE ChallengeTypeID =={}''' .format(row[0])
             cur2 = conn.execute(query)
-            challengeTypes.append(new_cht)
+            
+            self.challengeTypes.append(new_cht)
             for row2 in cur2:
                 new_ch = Challenge(new_cht, row2[1], row2[2], row2[3],row2[4],row2[5],row2[6],row2[7], None, row2[9])
-                query = ('''SELECT name FROM GameObject WHERE id == {}'''.format(row2[8])  )
+               
+                print(row2[8])
+                query = ('''SELECT name FROM GameObject WHERE id == {}'''.format(row2[8]))
                 go_name = conn.execute(query)
-                new.ch.itemReward = self.find_object(go_name)
+                new_ch.itemReward = self.find_object(go_name)
+                self.challenges.append(new_ch)
 
     
     def find_object(self,name):

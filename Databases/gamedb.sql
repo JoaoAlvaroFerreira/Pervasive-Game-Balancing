@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS Game (
 CREATE TABLE IF NOT EXISTS Player(
 	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	gameID int,
-	name text NOT NULL,
+	name text NOT NULL UNIQUE,
 	FOREIGN KEY (gameID) REFERENCES Game (id)
 );
 
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS Personality(
 CREATE TABLE IF NOT EXISTS ChallengeType (
 	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	gameID int,
-	name text NOT NULL,
+	name text NOT NULL UNIQUE,
 	temporary boolean NOT NULL,
 	narrative boolean NOT NULL,
 	locationRelevant boolean NOT NULL,
@@ -111,6 +111,15 @@ CREATE TABLE IF NOT EXISTS GameObject(
 	name text NOT NULL,
 	keyItem boolean,
 	FOREIGN KEY (gameObjectTypeID) REFERENCES GameObjectType (id)
+);
+
+CREATE TABLE IF NOT EXISTS PlayMoment(
+	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+	playerID int NOT NULL,
+	latitude int NOT NULL,
+	longitude int NOT NULL,
+	play_timestamp DATE NOT NULL,
+	FOREIGN KEY (playerID) REFERENCES Player(id)
 );
 
 /*
