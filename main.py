@@ -71,7 +71,11 @@ if __name__ == '__main__':
         game = GameManagement()
         connection = create_connection(".\Databases\games.db")
         game.sim(connection)
-        
+    
+    elif sys.argv[1] == "plot":
+        game = GameManagement()
+        connection = create_connection(".\Databases\games.db")
+        game.plot(connection)       
 
     elif sys.argv[1] == "analyse":
 

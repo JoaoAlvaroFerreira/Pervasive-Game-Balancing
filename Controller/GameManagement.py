@@ -6,6 +6,7 @@ from Model.game import *
 import datetime
 import random
 import pandas as pd
+import matplotlib.pyplot as plt
 
 class GameManagement:
     
@@ -16,9 +17,10 @@ class GameManagement:
         self.gameplay_moments = []
         
 
-        #for player in self.players:
-        #    print("inserting player "+player.name)
-        #    player.insert_player(conn)
+        
+        for player in self.players:
+            print("inserting player "+player.name)
+            player.insert_player(conn)
 
         for got in self.gameObjectTypes:
             print("inserting got "+got.name)
@@ -40,14 +42,33 @@ class GameManagement:
             ch.insert_into_db(conn)
 
         
-      
+    def plot(self, conn):
+        self.load(conn)
+        longs = [-6,-4,-2]
+        lats = [38,40,43]
+        for player in self.players:
+            lats.append(player.PlayerLocationInfo.latitude)
+            longs.append(player.PlayerLocationInfo.longitude)
+
+        df = pd.DataFrame([lats, longs]).T
+        df.columns=['Latitude', 'Longitude']
+        ruh_m = plt.imread('Resources/map.png')
+        BBox = (-10.371, 3.735, 35.443, 44.402)
+        fig, ax = plt.subplots(figsize = (8,7))
+        
+        ax.scatter(df.Longitude, df.Latitude, zorder=1, alpha= 1, c='b', s=10)
+        ax.set_title('Iberian Peninsula Players')
+        ax.set_xlim(BBox[0],BBox[1])
+        ax.set_ylim(BBox[2],BBox[3])
+        ax.imshow(ruh_m, zorder=0, extent = BBox, aspect= 'equal')
+        plt.show()
 
 
     
     def load(self, conn):
         self.players = []
         self.gameplay_moments = []
-        #self.load_moments(conn)
+        self.load_moments(conn)
 
         cur = conn.execute(''' SELECT id, name from Player''' )
         for row in cur:
@@ -66,6 +87,9 @@ class GameManagement:
 
         self.load_challenges(conn)
             
+        
+    def load_moments(self, conn):
+        print("DO LOAD MOMENTS")
        
     def sim(self, conn):
         self.load(conn)
