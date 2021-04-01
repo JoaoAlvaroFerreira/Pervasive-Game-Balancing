@@ -22,7 +22,8 @@ class Player:
                 VALUES("{}") '''.format(self.name)
         cur = conn.cursor()
         cur.execute(sql)
-        conn.commit()        
+        conn.commit()    
+        self.id = cur.lastrowid            
         return cur.lastrowid
 
     def load_player(self,conn, id):

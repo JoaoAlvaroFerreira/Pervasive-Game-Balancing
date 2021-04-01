@@ -24,5 +24,6 @@ class PlayMoment:
         cur = conn.cursor()
         cur.execute(sql)
         conn.commit()        
+        self.id = cur.lastrowid
         return cur.lastrowid
 

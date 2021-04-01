@@ -109,7 +109,7 @@ def generatePlayer():
     
     r = json.loads(response.text)
 
-    for _ in range(0,1):
+    for _ in range(0,10):
     
         player = Player(names.get_full_name())
 

@@ -122,22 +122,20 @@ CREATE TABLE IF NOT EXISTS PlayMoment(
 	FOREIGN KEY (playerID) REFERENCES Player(id)
 );
 
-/*
+
 
 CREATE TABLE IF NOT EXISTS ChallengeInstance (
 	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	ChallengeID int NOT NULL,
-	name text NOT NULL,
-	dateSpawned DATE NOT NULL,
-	latitude integer,
-	longitude integer,
+	attempted boolean NOT NULL,
+	success boolean NOT NULL,
 	completed boolean NOT NULL,
 	playerID int NOT NULL,
-	playerID2 int,
+	ch_timestamp DATE NOT NULL,
 	FOREIGN KEY (playerID) REFERENCES Player (id),
 	FOREIGN KEY (ChallengeID) REFERENCES Challenge (id)
 );
-
+/*
 CREATE TABLE IF NOT EXISTS ChallengeTarget(
 	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	targetOrder int NOT NULL,

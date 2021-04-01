@@ -64,11 +64,14 @@ class GameManagement:
         plt.show()
 
 
+
     
     def load(self, conn):
         self.players = []
+        self.load_game_objects(conn)
+        self.load_challenges(conn)
         self.gameplay_moments = []
-        self.load_moments(conn)
+        self.challenge_instances = []
 
         cur = conn.execute(''' SELECT id, name from Player''' )
         for row in cur:
@@ -78,18 +81,20 @@ class GameManagement:
             sql = ''' SELECT id, latitude, longitude, play_timestamp FROM PlayMoment WHERE playerID == {} '''.format(row[0])
             cur2 = conn.execute(sql)
             for row2 in cur2:
-                new_gm = PlayMoment(cur2[1],cur2[2],cur2[3])
+                new_gm = PlayMoment(new_p, cur2[1],cur2[2],cur2[3])
                 self.gameplay_moments.append(new_gm)
-
-        
-    
-        self.load_game_objects(conn)
-
-        self.load_challenges(conn)
             
-        
-    def load_moments(self, conn):
-        print("DO LOAD MOMENTS")
+            sql = ''' SELECT id, challengeID, attempted, success, ch_timestamp FROM ChallengeInstance WHERE playerID == {} '''.format(row[0])
+            cur3 = conn.execute(sql)
+            for row3 in cur3:
+                ch =  self.find_challenge(cur3[1])
+                new_chi = ChallengeInstance(ch, cur3[2],cur3[3], new_p, cur3[4])
+                self.challenge_instances.append(new_chi)
+      
+
+       
+            
+
        
     def sim(self, conn):
         self.load(conn)
@@ -99,6 +104,9 @@ class GameManagement:
         
         for gm in self.gameplay_moments:
             gm.insert_into_db()
+        
+        for chi in self.challenge_instances:
+            chi.insert_into_db()
 
 
     def load_game_objects(self, conn):
@@ -140,10 +148,15 @@ class GameManagement:
     def find_object(self,name):
         
         for obj in self.gameObjects:
-            if obj.name == "name":
+            if obj.name == name:
                 return obj
         
         return None
+
+    def find_challenge(self, id):
+        for challenge in self.challenges:
+            if challenge.id == id:
+                return challenge
         
        
     def generatePlayers(self):
@@ -202,7 +215,7 @@ class GameManagement:
         
 
     def total_play(self,player):
-        player.motivation = 5
+        player.motivation = player.Personality.Competitivenessw
         date =  datetime.datetime(2021, 1, 1,0,0)
         for _ in range(1, 365):
             
@@ -234,7 +247,54 @@ class GameManagement:
             self.create_moment(player, curr_lat, curr_long, datetime) 
             a = a+1
 
+            doable_challenges = self.find_doable_challenge_location(curr_lat, curr_long)
+            #visible_challenges = self.find_visible_challenge_location(curr_lat, curr_long)
 
+            if len(doable_challenges) > 0:
+                a = a - self.do_challenges(doable_challenges, player, datetime)
+                
+
+
+    
+    def find_doable_challenge_location(self, curr_lat, curr_long):
+        
+        doable_challenges = []
+
+        for challenge in self.challenges:
+            min_lat = challenge.latitude - challenge.radiusLocationAvailable
+            max_lat = challenge.latitude + challenge.radiusLocationAvailable
+            min_long = challenge.longitude - challenge.radiusLocationAvailable
+            max_long = challenge.longitude + challenge.radiusLocationAvailable
+
+            if curr_lat > min_lat and curr_lat< max_lat and curr_long>min_long and curr_long < max_long:
+                doable_challenges.append(challenge)
+            
+
+        return doable_challenges
+
+    def do_challenges(self, doable_challenges, player, datetime):
+        
+        verify_done()
+
+        for ch in doable_challenges:
+            if ch.ChallengeType.temporary:
+                if self.verify_done(ch, player):
+                    continue
+            
+            chi = ChallengeInstance(ch, True, rd.nextBoolean(), player,datetime)
+            self.challenge_instances.append(chi)
+            return 1
+        
+        return 0
+        
+
+    def verify_done(self, ch, player):
+        
+        for chi in self.challenge_instances:
+            if chi.player == player and chi.Challenge == ch and chi.attempted == True:
+                return True
+        
+        return False
         
     def create_moment(self,player, latitude, longitude, timestamp):
         self.gameplay_moments.append(PlayMoment(player, latitude, longitude, timestamp))

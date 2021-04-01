@@ -14,6 +14,7 @@ class ChallengeType :
         cur = conn.cursor()
         cur.execute(sql)
         conn.commit()        
+        self.id = cur.lastrowid        
         return cur.lastrowid
 
 
@@ -59,16 +60,39 @@ class Challenge:
                 VALUES("{}","{}","{}","{}","{}","{}","{}","{}","{}","{}") '''.format(cht_id,self.name, self.startDateAvailable, self.endDateAvailable, self.radiusLocationAvailable, self.radiusLocationVisible, self.latitude, self.longitude, go_id, self.Multiplayer)
         cur = conn.cursor()
         cur.execute(sql)
-        conn.commit()        
+        conn.commit()
+        self.id = cur.lastrowid                
         return cur.lastrowid
 
 
 class ChallengeInstance:
-    def __init__(self,Challenge, name, completed,player):
+    def __init__(self,Challenge, attempted, success,player, timestamp):
         self.Challenge = Challenge
-        self.name = name
-        self.completed = completed
+        self.attempted = attempted
+        self.success = success
         self.player = player
+        self.timestamp = timestamp
+
+
+    def insert_into_db(self,conn):
+        
+        query = ''' SELECT id FROM Player WHERE name == "{}"''' .format(self.Player.name)
+        cur = conn.execute(query)
+        for row in cur:
+            player_id = row[0]
+        query = ''' SELECT id FROM Challenge WHERE name == "{}" AND longitude == "{}" AND latitude == "{}"''' .format(self.Challenge.name, self.Challenge.longitude, self.Challenge.latitude)
+        cur = conn.execute(query)
+        for row in cur:
+            ch_id = row[0]
+
+
+        sql = ''' INSERT INTO ChallengeInstance(ChallengeID, attempted, success, playerID, ch_timestamp)
+                VALUES("{}","{}","{}","{}","{}") '''.format(ch_id, self.attempted, self.success, player_id, self.timestamp)
+        cur = conn.cursor()
+        cur.execute(sql)
+        conn.commit()
+        self.id = cur.lastrowid        
+        return cur.lastrowid
 
 class ChallengeTarget: 
     def __init__(self,targetOrder, challengeInstance, dateSpawned, dateCompleted, completed, latitudeCompleted, longitudeCompleted, itemReward):
