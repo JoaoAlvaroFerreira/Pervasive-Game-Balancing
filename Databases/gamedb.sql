@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS PlayerLocationInfo(
 CREATE TABLE IF NOT EXISTS Demographic(
 	playerID int PRIMARY KEY,
 	Age int NOT NULL,
-	Education text NOT NULL,
+	Gender text NOT NULL,
 	SocioEconomicStatus int NOT NULL,
 	FOREIGN KEY (playerID) REFERENCES Player (id)
 );
@@ -129,7 +129,6 @@ CREATE TABLE IF NOT EXISTS ChallengeInstance (
 	ChallengeID int NOT NULL,
 	attempted boolean NOT NULL,
 	success boolean NOT NULL,
-	completed boolean NOT NULL,
 	playerID int NOT NULL,
 	ch_timestamp DATE NOT NULL,
 	FOREIGN KEY (playerID) REFERENCES Player (id),

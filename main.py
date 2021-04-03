@@ -1,6 +1,9 @@
 import sqlite3
 from Model.player import Player
 from Controller.GameManagement import *
+from Controller.Simulation import *
+from Controller.Analytics import *
+from View.plots import *
 import requests
 import names
 from sqlite3 import Error
@@ -57,7 +60,7 @@ if __name__ == '__main__':
     #screen()
 
     if len(sys.argv) < 2:
-        print("Use python ./main <create|sim|analyse>")
+        print("Use python ./main <create|sim|plot|analyse>")
         exit()
 
     if sys.argv[1] == "create":
@@ -70,29 +73,24 @@ if __name__ == '__main__':
     elif sys.argv[1] == "sim":
         game = GameManagement()
         connection = create_connection(".\Databases\games.db")
-        game.sim(connection)
+        game.load(connection)
+        sim = Simulation(game)
+        sim.sim()
     
     elif sys.argv[1] == "plot":
         game = GameManagement()
         connection = create_connection(".\Databases\games.db")
-        game.plot(connection)       
+        game.load(connection)
+        plot_players(game.players)       
 
     elif sys.argv[1] == "analyse":
-
-       connection = create_connection(".\Databases\games.db")
-       create_tables(connection)
-       insert_game(connection)
-       a = Player("Joao")
-       a.PlayerLocationInfo = PlayerLocationInfo(50,40,"Portugal")
-      
-      
-
-       a.insert_player(connection)
-       print(a.PlayerLocationInfo.country)
- 
-       print_all_players(connection)
+        game = GameManagement()
+        connection = create_connection(".\Databases\games.db")
+        game.load(connection)
+        an = Analytics(game)
+        an.analyse_players() 
     
-    else: print("Use python ./main <create|sim|analyse>")
+    else: print("Use python ./main <create|sim|plot>")
 
 
     

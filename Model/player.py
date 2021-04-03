@@ -12,10 +12,10 @@ class Player:
         #use completion rate as well as pure volume of catches as metrics for conclusions.
     
     def insert_player(self,conn):
-        id = self.insert_into_db(conn)
-        #self.PlayerLocationInfo.insert_into_db(conn, id)
-        #self.Demographic.insert_into_db(conn, id)
-        #self.Personality.insert_into_db(conn, id)
+        self.id = self.insert_into_db(conn)
+        self.PlayerLocationInfo.insert_into_db(conn, self.id)
+        self.Demographic.insert_into_db(conn, self.id)
+        self.Personality.insert_into_db(conn, self.id)
 
     def insert_into_db(self,conn):
         sql = ''' INSERT INTO Player(name)
@@ -27,6 +27,7 @@ class Player:
         return cur.lastrowid
 
     def load_player(self,conn, id):
+        self.id = id
         query = ''' SELECT latitude,longitude,country FROM PlayerLocationInfo WHERE playerID == {}'''.format(id)
         cur = conn.execute(query)
         for row in cur:
@@ -36,6 +37,7 @@ class Player:
         cur = conn.execute(query)
         for row in cur:
             self.Demographic = Demographic(row[0], row[1], row[2])
+
 
         query = ''' SELECT Concentration,Competitiveness,PlayerSkills,UserControl,ClearGoals,Feedback,Immersion,SocialInteraction,Free2Play, PersonalityType from Personality WHERE playerID == {}''' .format(id)
         cur = conn.execute(query)

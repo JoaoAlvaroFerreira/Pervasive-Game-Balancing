@@ -67,6 +67,7 @@ class GameManagement:
 
     
     def load(self, conn):
+        self.conn = conn
         self.players = []
         self.load_game_objects(conn)
         self.load_challenges(conn)
@@ -81,14 +82,14 @@ class GameManagement:
             sql = ''' SELECT id, latitude, longitude, play_timestamp FROM PlayMoment WHERE playerID == {} '''.format(row[0])
             cur2 = conn.execute(sql)
             for row2 in cur2:
-                new_gm = PlayMoment(new_p, cur2[1],cur2[2],cur2[3])
+                new_gm = PlayMoment(new_p, row2[1],row2[2],row2[3])
                 self.gameplay_moments.append(new_gm)
             
             sql = ''' SELECT id, challengeID, attempted, success, ch_timestamp FROM ChallengeInstance WHERE playerID == {} '''.format(row[0])
             cur3 = conn.execute(sql)
             for row3 in cur3:
-                ch =  self.find_challenge(cur3[1])
-                new_chi = ChallengeInstance(ch, cur3[2],cur3[3], new_p, cur3[4])
+                ch =  self.find_challenge(row3[1])
+                new_chi = ChallengeInstance(ch, row3[2],row3[3], new_p, row3[4])
                 self.challenge_instances.append(new_chi)
       
 
@@ -100,13 +101,13 @@ class GameManagement:
         self.load(conn)
 
         for player in self.players:
-            total_play(player)
+            self.total_play(player)
         
-        for gm in self.gameplay_moments:
-            gm.insert_into_db()
+        #for gm in self.gameplay_moments:
+        #    gm.insert_into_db(self.conn)
         
-        for chi in self.challenge_instances:
-            chi.insert_into_db()
+        #for chi in self.challenge_instances:
+        #    chi.insert_into_db(self.conn)
 
 
     def load_game_objects(self, conn):
@@ -137,6 +138,7 @@ class GameManagement:
             self.challengeTypes.append(new_cht)
             for row2 in cur2:
                 new_ch = Challenge(new_cht, row2[1], row2[2], row2[3],row2[4],row2[5],row2[6],row2[7], None, row2[9])
+                new_ch.id = row2[0]
                
                 print(row2[8])
                 query = ('''SELECT name FROM GameObject WHERE id == {}'''.format(row2[8]))
@@ -214,90 +216,10 @@ class GameManagement:
         
         
 
-    def total_play(self,player):
-        player.motivation = player.Personality.Competitivenessw
-        date =  datetime.datetime(2021, 1, 1,0,0)
-        for _ in range(1, 365):
-            
-            date = date + datetime.timedelta(hours = 1)
-            load_file = 'Resources/weather.csv'
-            df = pd.read_csv(load_file)
-            today = df.loc[df['Day'] == date.timetuple().tm_yday]
-            print("The weather is:"+today['Weather'])
-
-            if player.motivation > 1:
-                self.gameplay_session(player, date)
-
-            print(date)
-            print("Concentration: ")
-            print(player.Personality.Concentration)
-
-    def gameplay_session(self,player, datetime):
-        
-        curr_lat = player.PlayerLocationInfo.latitude
-        curr_long = player.PlayerLocationInfo.longitude
-        a = 0
-
-        while a < 2:
-            rand_mod_a = random.uniform(-0.05,0.05)
-            rand_mod_b  = random.uniform(-0.05,0.05)
-            curr_lat = curr_lat + rand_mod_a
-            curr_long = curr_long + rand_mod_b
-
-            self.create_moment(player, curr_lat, curr_long, datetime) 
-            a = a+1
-
-            doable_challenges = self.find_doable_challenge_location(curr_lat, curr_long)
-            #visible_challenges = self.find_visible_challenge_location(curr_lat, curr_long)
-
-            if len(doable_challenges) > 0:
-                a = a - self.do_challenges(doable_challenges, player, datetime)
-                
-
-
-    
-    def find_doable_challenge_location(self, curr_lat, curr_long):
-        
-        doable_challenges = []
-
-        for challenge in self.challenges:
-            min_lat = challenge.latitude - challenge.radiusLocationAvailable
-            max_lat = challenge.latitude + challenge.radiusLocationAvailable
-            min_long = challenge.longitude - challenge.radiusLocationAvailable
-            max_long = challenge.longitude + challenge.radiusLocationAvailable
-
-            if curr_lat > min_lat and curr_lat< max_lat and curr_long>min_long and curr_long < max_long:
-                doable_challenges.append(challenge)
-            
-
-        return doable_challenges
-
-    def do_challenges(self, doable_challenges, player, datetime):
-        
-        verify_done()
-
-        for ch in doable_challenges:
-            if ch.ChallengeType.temporary:
-                if self.verify_done(ch, player):
-                    continue
-            
-            chi = ChallengeInstance(ch, True, rd.nextBoolean(), player,datetime)
-            self.challenge_instances.append(chi)
-            return 1
-        
-        return 0
-        
-
-    def verify_done(self, ch, player):
-        
-        for chi in self.challenge_instances:
-            if chi.player == player and chi.Challenge == ch and chi.attempted == True:
-                return True
-        
-        return False
-        
     def create_moment(self,player, latitude, longitude, timestamp):
-        self.gameplay_moments.append(PlayMoment(player, latitude, longitude, timestamp))
+        gm = PlayMoment(player, latitude, longitude, timestamp)
+        gm.insert_into_db(self.conn)
+        self.gameplay_moments.append(gm)
 
 
         

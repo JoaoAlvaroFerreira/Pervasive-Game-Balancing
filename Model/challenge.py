@@ -76,18 +76,10 @@ class ChallengeInstance:
 
     def insert_into_db(self,conn):
         
-        query = ''' SELECT id FROM Player WHERE name == "{}"''' .format(self.Player.name)
-        cur = conn.execute(query)
-        for row in cur:
-            player_id = row[0]
-        query = ''' SELECT id FROM Challenge WHERE name == "{}" AND longitude == "{}" AND latitude == "{}"''' .format(self.Challenge.name, self.Challenge.longitude, self.Challenge.latitude)
-        cur = conn.execute(query)
-        for row in cur:
-            ch_id = row[0]
-
+       
 
         sql = ''' INSERT INTO ChallengeInstance(ChallengeID, attempted, success, playerID, ch_timestamp)
-                VALUES("{}","{}","{}","{}","{}") '''.format(ch_id, self.attempted, self.success, player_id, self.timestamp)
+                VALUES("{}","{}","{}","{}","{}") '''.format(self.Challenge.id, self.attempted, self.success, self.player.id, self.timestamp)
         cur = conn.cursor()
         cur.execute(sql)
         conn.commit()
