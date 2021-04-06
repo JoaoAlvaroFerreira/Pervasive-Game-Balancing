@@ -15,7 +15,7 @@ import Resources.utils as utils
 def generateDemo(player, latitude, longitude, r ):
 
 
-    df = pd.read_csv('Resources/quality_of_life.csv')
+    df = pd.read_csv('D:\\School\\5oAno\\TESE\Repo\\Pervasive-Game-Balancing\\Resources\\quality_of_life.csv')
     
 
 
@@ -109,8 +109,9 @@ def generatePlayer():
     
     r = json.loads(response.text)
 
+    
     if 'address' in r and r['address']['country']!= "France" and r['address']['country']!= "Czechia":
-        for _ in range(0,1):
+        for _ in range(0,3):
         
             player = Player(names.get_full_name())
 
@@ -121,7 +122,7 @@ def generatePlayer():
             
             player.Personality = generatePersonality(player.Demographic)
             player_batch.append(player)
-    else: return
+    
 
     return player_batch
     

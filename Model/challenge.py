@@ -69,7 +69,7 @@ class ChallengeInstance:
     def __init__(self,Challenge, attempted, success,player, timestamp):
         self.Challenge = Challenge
         self.attempted = attempted
-        self.success = success
+        self.success = success #change to int
         self.player = player
         self.timestamp = timestamp
 
@@ -85,17 +85,3 @@ class ChallengeInstance:
         conn.commit()
         self.id = cur.lastrowid        
         return cur.lastrowid
-
-class ChallengeTarget: 
-    def __init__(self,targetOrder, challengeInstance, dateSpawned, dateCompleted, completed, latitudeCompleted, longitudeCompleted, itemReward):
-        self.targetOrder = targetOrder
-        self.challengeInstance = challengeInstance
-        self.dateSpawned = dateSpawned
-        self.dateCompleted = dateCompleted
-        self.completed = completed
-        self.latitudeCompleted = latitudeCompleted
-        self.longitudeCompleted = longitudeCompleted
-        self.itemReward = itemReward
-
-	
-#remember to allow the option for activation ranges as well as temporal and social ranges (ie. need 5-7 people for raid)!!!!!!! otherwise poke stops get owned

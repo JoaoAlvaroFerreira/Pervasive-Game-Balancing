@@ -50,7 +50,7 @@ def worldpopapi_geotiff_get(country):
 
 def location_data_from_CSVs(latitude, longitude, buffer, demo):
 
-  load_file = 'Resources/CountryDistributionCSVs/{}.csv'.format(demo)
+  load_file = 'D:\\School\\5oAno\\TESE\Repo\\Pervasive-Game-Balancing\\Resources\\CountryDistributionCSVs\{}.csv'.format(demo)
   df = pd.read_csv(load_file)
   locations_df = df.loc[(df['latitude'] > latitude - buffer) & (df['latitude'] < latitude+buffer) & (df['longitude'] > longitude - buffer) & (df['longitude'] < longitude+buffer)]
   return locations_df['population'].mean()

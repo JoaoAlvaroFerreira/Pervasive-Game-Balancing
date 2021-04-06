@@ -9,6 +9,9 @@ import names
 from sqlite3 import Error
 import sys
 
+
+DB_PATH = "D:\\School\\5oAno\\TESE\\Repo\\Pervasive-Game-Balancing\\Databases\\games.db"
+
 def create_connection(path):
     connection = None
     try:
@@ -23,7 +26,7 @@ def create_tables(conn):
   
     try:
         cursor = conn.cursor()
-        sql_file = open(".\Databases\gamedb.sql")
+        sql_file = open("D:\\School\\5oAno\\TESE\\Repo\\Pervasive-Game-Balancing\\Databases\\gamedb.sql")
         sql_as_string = sql_file.read()
         cursor.executescript(sql_as_string)
        
@@ -65,27 +68,28 @@ if __name__ == '__main__':
 
     if sys.argv[1] == "create":
         game = GameManagement()
-        connection = create_connection(".\Databases\games.db")
+        connection = create_connection(DB_PATH)
         create_tables(connection)
         insert_game(connection)
         game.create(connection)
 
     elif sys.argv[1] == "sim":
         game = GameManagement()
-        connection = create_connection(".\Databases\games.db")
+        connection = create_connection(DB_PATH)
         game.load(connection)
         sim = Simulation(game)
         sim.sim()
     
     elif sys.argv[1] == "plot":
         game = GameManagement()
-        connection = create_connection(".\Databases\games.db")
+        connection = create_connection(DB_PATH)
         game.load(connection)
-        plot_players(game.players)       
+        plot_players(game.players)    
+        #plotplot()   
 
     elif sys.argv[1] == "analyse":
         game = GameManagement()
-        connection = create_connection(".\Databases\games.db")
+        connection = create_connection(DB_PATH)
         game.load(connection)
         an = Analytics(game)
         an.analyse_players() 

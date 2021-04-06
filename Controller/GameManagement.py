@@ -69,8 +69,8 @@ class GameManagement:
     def load(self, conn):
         self.conn = conn
         self.players = []
-        self.load_game_objects(conn)
-        self.load_challenges(conn)
+        self.load_game_objects()
+        self.load_challenges()
         self.gameplay_moments = []
         self.challenge_instances = []
 
@@ -110,30 +110,30 @@ class GameManagement:
         #    chi.insert_into_db(self.conn)
 
 
-    def load_game_objects(self, conn):
+    def load_game_objects(self):
         self.gameObjectTypes = []
         self.gameObjects = []
-        cur = conn.execute(''' SELECT id, name, importance from GameObjectType''' )
+        cur = self.conn.execute(''' SELECT id, name, importance from GameObjectType''' )
 
         for row in cur:
             new_got = GameObjectType(self,row[1], row[2])
             query = ''' SELECT id, name, keyItem from GameObject WHERE gameObjectTypeID =={}''' .format(row[0])
-            cur2 = conn.execute(query)
+            cur2 = self.conn.execute(query)
             self.gameObjectTypes.append(new_got)
             for row2 in cur2:
                 new_go = GameObject(new_got, row2[1], row2[2])
                 self.gameObjects.append(new_go)
                 
 
-    def load_challenges(self, conn):
+    def load_challenges(self):
         self.challengeTypes = []
         self.challenges = []
-        cur = conn.execute(''' SELECT id,name, temporary, narrative, locationRelevant, uniqueChallenge from ChallengeType''' )
+        cur = self.conn.execute(''' SELECT id,name, temporary, narrative, locationRelevant, uniqueChallenge from ChallengeType''' )
 
         for row in cur:
             new_cht = ChallengeType(self,row[1], row[2], row[3],row[4], row[5])
             query = ''' SELECT id, name, startDateAvailable, endDateAvailable, radiusLocationAvailable, radiusLocationVisible, latitude, longitude, itemReward, Multiplayer From Challenge WHERE ChallengeTypeID =={}''' .format(row[0])
-            cur2 = conn.execute(query)
+            cur2 = self.conn.execute(query)
             
             self.challengeTypes.append(new_cht)
             for row2 in cur2:
@@ -142,7 +142,7 @@ class GameManagement:
                
                
                 query = ('''SELECT name FROM GameObject WHERE id == {}'''.format(row2[8]))
-                go_name = conn.execute(query)
+                go_name = self.conn.execute(query)
                 new_ch.itemReward = self.find_object(go_name)
                 self.challenges.append(new_ch)
 
@@ -164,7 +164,7 @@ class GameManagement:
     def generatePlayers(self):
         self.players = []
 
-        for _ in range(1):
+        for _ in range(3):
             self.players.extend(playgen.generatePlayer())
 
         
@@ -181,14 +181,14 @@ class GameManagement:
         self.challenges = []
 
         self.challengeTypes.append(ChallengeType(self, "PokeStops", False, False, True, False))
-        self.challengeTypes.append(ChallengeType(self,"PokemonCatch", True, False, True, False))
+        self.challengeTypes.append(ChallengeType(self,"PokemonCatch", True, False, False, False))
         self.challengeTypes.append(ChallengeType("Missions", True, True, True, True, True))
         
         for player in self.players:
             self.spawnPokemon(player)
 
       
-
+    
     
     def spawnPokeStops(self,player): #rework
         for _ in range(0,5):
@@ -196,7 +196,7 @@ class GameManagement:
             rand_mod_b  = random.uniform(-0.2,0.2)
             a = Challenge(self.challengeTypes[0], "PokeStop Metro", 0, 0, 0,0, player.PlayerLocationInfo.latitude, player.PlayerLocationInfo.longitude, "No Reward", False)
             self.challenges.append(a)
-        
+    
     def spawnPokemon(self, player):
         
         
