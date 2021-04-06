@@ -79,10 +79,10 @@ class GameManagement:
             new_p = Player(row[1])
             new_p.load_player(conn,row[0])
             self.players.append(new_p)
-            sql = ''' SELECT id, latitude, longitude, play_timestamp FROM PlayMoment WHERE playerID == {} '''.format(row[0])
+            sql = ''' SELECT id, latitude, longitude, play_timestamp, gameSession FROM PlayMoment WHERE playerID == {} '''.format(row[0])
             cur2 = conn.execute(sql)
             for row2 in cur2:
-                new_gm = PlayMoment(new_p, row2[1],row2[2],row2[3])
+                new_gm = PlayMoment(new_p, row2[1],row2[2],row2[3], row2[4])
                 self.gameplay_moments.append(new_gm)
             
             sql = ''' SELECT id, challengeID, attempted, success, ch_timestamp FROM ChallengeInstance WHERE playerID == {} '''.format(row[0])
@@ -140,7 +140,7 @@ class GameManagement:
                 new_ch = Challenge(new_cht, row2[1], row2[2], row2[3],row2[4],row2[5],row2[6],row2[7], None, row2[9])
                 new_ch.id = row2[0]
                
-                print(row2[8])
+               
                 query = ('''SELECT name FROM GameObject WHERE id == {}'''.format(row2[8]))
                 go_name = conn.execute(query)
                 new_ch.itemReward = self.find_object(go_name)
@@ -164,7 +164,7 @@ class GameManagement:
     def generatePlayers(self):
         self.players = []
 
-        for _ in range(1):
+        for _ in range(10):
             self.players.extend(playgen.generatePlayer())
 
         
@@ -217,8 +217,7 @@ class GameManagement:
         
 
     def create_moment(self,player, latitude, longitude, timestamp, i):
-        gm = PlayMoment(player, latitude, longitude, timestamp)
-        gm.i = i
+        gm = PlayMoment(player, latitude, longitude, timestamp,i)
         gm.insert_into_db(self.conn)
         self.gameplay_moments.append(gm)
 

@@ -116,6 +116,7 @@ CREATE TABLE IF NOT EXISTS GameObject(
 CREATE TABLE IF NOT EXISTS PlayMoment(
 	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	playerID int NOT NULL,
+	gameSession int NOT NULL,
 	latitude int NOT NULL,
 	longitude int NOT NULL,
 	play_timestamp DATE NOT NULL,

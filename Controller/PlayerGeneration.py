@@ -20,7 +20,7 @@ def generateDemo(player, latitude, longitude, r ):
 
 
     
-    if 'address' in r and r['address']['country']!= "France":
+    if 'address' in r and r['address']['country']!= "France" and r['address']['country']!= "Czechia":
 
         country_code = coco.convert(names=r['address']['country'], to='ISO3')
         country_df = df[df['Country']==r['address']['country']]
@@ -109,17 +109,19 @@ def generatePlayer():
     
     r = json.loads(response.text)
 
-    for _ in range(0,10):
-    
-        player = Player(names.get_full_name())
-
-        rand_mod_a = random.uniform(-0.2,0.2)
-        rand_mod_b  = random.uniform(-0.2,0.2)
-        player.PlayerLocationInfo = PlayerLocationInfo(latitude+rand_mod_a, longitude+rand_mod_b, r['address']['country'])
-        player.Demographic = generateDemo(player, latitude+rand_mod_a, longitude+rand_mod_b, r)
+    if 'address' in r and r['address']['country']!= "France" and r['address']['country']!= "Czechia":
+        for _ in range(0,10):
         
-        player.Personality = generatePersonality(player.Demographic)
-        player_batch.append(player)
+            player = Player(names.get_full_name())
+
+            rand_mod_a = random.uniform(-0.2,0.2)
+            rand_mod_b  = random.uniform(-0.2,0.2)
+            player.PlayerLocationInfo = PlayerLocationInfo(latitude+rand_mod_a, longitude+rand_mod_b, r['address']['country'])
+            player.Demographic = generateDemo(player, latitude+rand_mod_a, longitude+rand_mod_b, r)
+            
+            player.Personality = generatePersonality(player.Demographic)
+            player_batch.append(player)
+    else: return
 
     return player_batch
     
