@@ -8,6 +8,8 @@ import random
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
+from View.plots import *
+
 
 class Analytics:
     def __init__(self, game):
@@ -18,8 +20,9 @@ class Analytics:
         for player in self.game.players:
             a = self.get_player_challenges(player)
             b = self.get_player_moments(player)
+            plot_player_moments(b)
             avg_distance = self.measure_distances(b)
-            string = "Player {} engaged with {} challenges and has {} recorded play moments, in a total of X days".format(player.name,len(a),len(b))
+            string = "Player {} engaged with {} challenges and has {} recorded play moments, in a total of {} play sessions. He has walked a total of {} Km".format(player.name,len(a),len(b), b[len(b)-1].session,avg_distance)
 
             print(string )
         #print(len(self.game.gameplay_moments))
@@ -50,13 +53,11 @@ class Analytics:
         return value_distance
             
     def calc_distance_two_moments(self,moment1, moment2):
-       latdelta = math.abs(moment1.latitude - moment2.latitude)
-       longdelta = math.abs(moment1.longitude - moment2.longitude)
-       hdist = longdelta * 110574
-       vdist = latdelta * 111.320*math.cos(longdelta)
-       dist = math.sqrt(math.pow(hdist,2)+math.pow(vdist,2))
 
-       return dist
+    
+        p = math.pi/180
+        a = 0.5 - math.cos((moment2.latitude-moment1.latitude)*p)/2 + math.cos(moment1.latitude*p) * math.cos(moment2.latitude*p) * (1-math.cos((moment2.longitude-moment1.longitude)*p))/2
+        return 12742 * math.asin(math.sqrt(a)) #2*R*asin...
 
 
     

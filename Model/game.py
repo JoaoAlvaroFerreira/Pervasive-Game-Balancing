@@ -21,7 +21,7 @@ class PlayMoment:
             cht_id = row[0]
 
         sql = ''' INSERT INTO PlayMoment(playerID, gameSession, latitude, longitude, play_timestamp)
-                VALUES("{}","{}","{}","{}") '''.format(cht_id, self.session, self.latitude, self.longitude, self.time)
+                VALUES("{}","{}","{}","{}","{}") '''.format(cht_id, self.session, self.latitude, self.longitude, self.time)
         cur = conn.cursor()
         cur.execute(sql)
         conn.commit()        

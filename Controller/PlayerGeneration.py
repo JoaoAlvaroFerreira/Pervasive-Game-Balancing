@@ -110,7 +110,7 @@ def generatePlayer():
     r = json.loads(response.text)
 
     if 'address' in r and r['address']['country']!= "France" and r['address']['country']!= "Czechia":
-        for _ in range(0,10):
+        for _ in range(0,1):
         
             player = Player(names.get_full_name())
 
