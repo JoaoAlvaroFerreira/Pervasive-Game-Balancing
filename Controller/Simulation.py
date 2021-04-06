@@ -22,6 +22,7 @@ class Simulation:
     def total_play(self,player):
         player.motivation = player.Personality.Competitiveness
         date =  datetime.datetime(2021, 1, 1,0,0)
+        i = 0
         for _ in range(1, 365):
             
             date = date + datetime.timedelta(hours = 1)
@@ -31,17 +32,19 @@ class Simulation:
             print("The weather is:"+today['Weather'])
 
             if player.motivation > 1:
-                self.gameplay_session(player, date)
+                i = i+1
+                self.gameplay_session(player, date, i)
 
             print(date)
             print("Concentration: ")
             print(player.Personality.Concentration)
 
-    def gameplay_session(self,player, datetime):
+    def gameplay_session(self,player, datetime, i):
         
         curr_lat = player.PlayerLocationInfo.latitude
         curr_long = player.PlayerLocationInfo.longitude
         a = 0
+     
 
         while a < 2:
             rand_mod_a = random.uniform(-0.05,0.05)
@@ -49,7 +52,7 @@ class Simulation:
             curr_lat = curr_lat + rand_mod_a
             curr_long = curr_long + rand_mod_b
 
-            self.game.create_moment(player, curr_lat, curr_long, datetime) 
+            self.game.create_moment(player, curr_lat, curr_long, datetime, i) 
             a = a+1
 
             doable_challenges = self.find_doable_challenge_location(curr_lat, curr_long)

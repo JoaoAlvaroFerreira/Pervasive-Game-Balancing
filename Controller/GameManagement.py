@@ -216,8 +216,9 @@ class GameManagement:
         
         
 
-    def create_moment(self,player, latitude, longitude, timestamp):
+    def create_moment(self,player, latitude, longitude, timestamp, i):
         gm = PlayMoment(player, latitude, longitude, timestamp)
+        gm.i = i
         gm.insert_into_db(self.conn)
         self.gameplay_moments.append(gm)
 
