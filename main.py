@@ -94,6 +94,13 @@ if __name__ == '__main__':
         an = Analytics(game)
         an.analyse_players() 
     
+    elif sys.argv[1] == "populate":
+        game = GameManagement()
+        connection = create_connection(DB_PATH)
+        game.populate(connection)
+        an = Analytics(game)
+        an.show_challenges()
+    
     else: print("Use python ./main <create|sim|plot>")
 
 

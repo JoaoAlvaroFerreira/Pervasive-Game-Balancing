@@ -70,6 +70,24 @@ def heatmap_plot(players):
     myMap.save("map.html")
     webbrowser.open("map.html")
 
+def plot_challenges(challenges):
+ 
+    LDN_COORDINATES = (40.2, -4)
+    myMap = folium.Map(location=LDN_COORDINATES, zoom_start=5)
+
+  
+    # Add marker for Boulder, CO
+    for challenge in challenges:
+        folium.Marker(
+            location=[challenge.latitude, challenge.longitude], # coordinates for the marker (Earth Lab at CU Boulder)
+            popup='Challenge', # pop-up label for the marker
+            icon=folium.Icon()
+        ).add_to(myMap)
+
+
+    myMap.save("challenge_map.html")
+    webbrowser.open("challenge_map.html")
+
 
          
 def plot_players(players):

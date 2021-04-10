@@ -68,4 +68,4 @@ def location_data_from_Overpass(latitude, longitude, buffer, query):
 
   result = api.query(querystring)
 
-  return len(result.get_nodes())/111
+  return result.get_nodes()

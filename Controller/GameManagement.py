@@ -3,6 +3,7 @@ from Model.player import *
 from Model.game_object import *
 from Model.challenge import *
 from Model.game import *
+from Resources.API import *
 import datetime
 import random
 import pandas as pd
@@ -109,6 +110,11 @@ class GameManagement:
         #for chi in self.challenge_instances:
         #    chi.insert_into_db(self.conn)
 
+    def populate(self, conn):
+        self.load(conn)
+
+        self.spawnPokeStops()
+
 
     def load_game_objects(self):
         self.gameObjectTypes = []
@@ -174,7 +180,7 @@ class GameManagement:
         self.gameObjects = []
 
         self.gameObjectTypes.append(GameObjectType(self, "Pokemon", 5))
-        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Charizard", False ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Pokemon", False ))
 
     def generateChallenges(self):
         self.challengeTypes = []
@@ -184,34 +190,37 @@ class GameManagement:
         self.challengeTypes.append(ChallengeType(self,"PokemonCatch", True, False, False, False))
         self.challengeTypes.append(ChallengeType("Missions", True, True, True, True, True))
         
-        for player in self.players:
-            self.spawnPokemon(player)
-
-      
-    
-    
-    def spawnPokeStops(self,player): #rework
-        for _ in range(0,5):
-            rand_mod_a = random.uniform(-0.2,0.2)
-            rand_mod_b  = random.uniform(-0.2,0.2)
-            a = Challenge(self.challengeTypes[0], "PokeStop Metro", 0, 0, 0,0, player.PlayerLocationInfo.latitude, player.PlayerLocationInfo.longitude, "No Reward", False)
+        #for player in self.players:
+            #self.spawnPokemon(player)    
+   
+    def spawnPokemon(self):
+        self.challenges = []
+        load_file = 'D:\\School\\5oAno\\TESE\Repo\\Pervasive-Game-Balancing\\Resources\\CountryDistributionCSVs\PRT_population.csv'
+              
+        df_acc = pd.read_csv(load_file)
+        df_acc = df_acc[df_acc['population']>40] # Reducing data size so it runs faster
+        df_acc = df_acc[(df_acc['latitude'] > 41) & (df_acc['latitude'] < 42)]
+        df_acc = df_acc[(df_acc['longitude'] > -9) & (df_acc['longitude'] < -8)]
+        # Add marker for Boulder, CO
+        for index, row in df_acc.iterrows():
+            a = Challenge(self.challengeTypes[1], "Catch Pokemon", 0, 0, 0.01,0.1, row['latitude'], row['longitude'], self.gameObjects[0], False)
             self.challenges.append(a)
+        
     
-    def spawnPokemon(self, player):
+    
+    def spawnPokeStops(self): #rework
+        nodes = location_data_from_Overpass(41,-8.5, 0.5, "public_transport")
         
-        
-        for _ in range(0,5):
-
-            rand_mod_a = random.uniform(-0.2,0.2)
-            rand_mod_b  = random.uniform(-0.2,0.2)
-            a = Challenge(self.challengeTypes[1], "Catch Charizard", 0, 0, 0.001,0.01, player.PlayerLocationInfo.latitude, player.PlayerLocationInfo.longitude, self.gameObjects[0], False)
+        for node in nodes:
+            a = Challenge(self.challengeTypes[0], "PokeStop Metro", 0,0, 0.01,0.1, node.lat, node.lon, "No Reward", False)
             self.challenges.append(a)
+           
     
     def spawnMissions(self,player): #rework
         for _ in range(0,5):
             rand_mod_a = random.uniform(-0.2,0.2)
             rand_mod_b  = random.uniform(-0.2,0.2)
-            a = Challenge(self.challengeTypes[1], "Starter mission", 0, 0, 0,0, player.PlayerLocationInfo.latitude, player.PlayerLocationInfo.longitude, "No Reward", False)
+            a = Challenge(self.challengeTypes[2], "Starter mission", 0, 0, 0,0, player.PlayerLocationInfo.latitude, player.PlayerLocationInfo.longitude, "No Reward", False)
             self.challenges.append(a)
         
         

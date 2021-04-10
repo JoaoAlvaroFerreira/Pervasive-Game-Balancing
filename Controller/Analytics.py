@@ -64,6 +64,9 @@ class Analytics:
         return 12742 * math.asin(math.sqrt(a)) #2*R*asin...
 
 
-    
+    def show_challenges(self):
+        print("There are {} challenges".format(len(self.game.challenges)))
+
+        plot_challenges(self.game.challenges)
 
 
