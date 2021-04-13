@@ -26,7 +26,7 @@ class Simulation:
         for _ in range(1, 365):
             
             date = date + datetime.timedelta(hours = 1)
-            load_file = 'Resources/weather.csv'
+            load_file = 'D:\\School\\5oAno\\TESE\Repo\\Pervasive-Game-Balancing\\Resources\\weather.csv'
             df = pd.read_csv(load_file)
             today = df.loc[df['Day'] == date.timetuple().tm_yday]
             print("The weather is:"+today['Weather'])
@@ -89,7 +89,7 @@ class Simulation:
                     continue
             
             chi = ChallengeInstance(ch, True, True , player,datetime)
-            chi.insert_into_db(self.conn)
+            chi.insert_into_db(self.game.conn)
             self.game.challenge_instances.append(chi)
             return 1
         
@@ -98,7 +98,7 @@ class Simulation:
 
     def verify_done(self, ch, player):
         
-        for chi in self.challenge_instances:
+        for chi in self.game.challenge_instances:
             if chi.player == player and chi.Challenge == ch and chi.attempted == True:
                 return True
         

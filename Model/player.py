@@ -33,6 +33,12 @@ class Player:
         for row in cur:
             self.PlayerLocationInfo = PlayerLocationInfo(row[0], row[1], row[2])
 
+              
+        query = ''' SELECT latitude,longitude,country FROM CommuteLocationInfo WHERE playerID == {}'''.format(id)
+        cur = conn.execute(query)
+        for row in cur:
+            self.CommuteLocationInfo = CommuteLocationInfo(row[0], row[1], row[2])
+
         query = ''' SELECT Age, Gender, SocioEconomicStatus FROM Demographic WHERE playerID == {}''' .format(id)
         cur = conn.execute(query)
         for row in cur:
@@ -93,6 +99,20 @@ class PlayerLocationInfo:
 
     def insert_into_db(self, conn, playerID):
         sql = ''' INSERT INTO PlayerLocationInfo(playerID, latitude, longitude, country)
+                VALUES("{}","{}","{}","{}") '''.format(playerID, self.latitude, self.longitude, self.country)
+        cur = conn.cursor()
+        cur.execute(sql)
+        conn.commit()
+        return cur.lastrowid
+
+class CommuteLocationInfo:
+    def __init__(self,latitude,longitude,country):
+        self.latitude = latitude
+        self.longitude = longitude
+        self.country = country
+
+    def insert_into_db(self, conn, playerID):
+        sql = ''' INSERT INTO CommuteLocationInfo(playerID, latitude, longitude, country)
                 VALUES("{}","{}","{}","{}") '''.format(playerID, self.latitude, self.longitude, self.country)
         cur = conn.cursor()
         cur.execute(sql)

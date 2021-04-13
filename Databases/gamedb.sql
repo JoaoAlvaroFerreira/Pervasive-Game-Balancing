@@ -44,6 +44,14 @@ CREATE TABLE IF NOT EXISTS PlayerLocationInfo(
 	FOREIGN KEY (playerID) REFERENCES Player (id)
 );
 
+CREATE TABLE IF NOT EXISTS CommuteLocationInfo(
+	playerID int PRIMARY KEY,
+	latitude int NOT NULL,
+	longitude int NOT NULL,
+	country text NOT NULL,
+	FOREIGN KEY (playerID) REFERENCES Player (id)
+);
+
 
 CREATE TABLE IF NOT EXISTS Demographic(
 	playerID int PRIMARY KEY,
@@ -92,6 +100,7 @@ CREATE TABLE IF NOT EXISTS Challenge (
 	latitude int,
 	longitude int,
 	itemReward int,
+	itemSpend int,
 	Multiplayer boolean NOT NULL,
 	FOREIGN KEY (ChallengeTypeID) REFERENCES ChallengeType (id)
 );
@@ -134,6 +143,13 @@ CREATE TABLE IF NOT EXISTS ChallengeInstance (
 	ch_timestamp DATE NOT NULL,
 	FOREIGN KEY (playerID) REFERENCES Player (id),
 	FOREIGN KEY (ChallengeID) REFERENCES Challenge (id)
+);
+
+CREATE TABLE IF NOT EXISTS Inventory(
+	playerID int NOT NULL,
+	GameObjectID int NOT NULL,
+	FOREIGN KEY (GameObjectID) REFERENCES GameObject (id),
+	FOREIGN KEY (playerID) REFERENCES Player (id)
 );
 /*
 CREATE TABLE IF NOT EXISTS ChallengeTarget(

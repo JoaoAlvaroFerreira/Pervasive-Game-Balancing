@@ -56,7 +56,7 @@ def location_data_from_CSVs(latitude, longitude, buffer, demo):
   return locations_df['population'].mean()
 
 
-def location_data_from_Overpass(latitude, longitude, buffer, query):
+def location_data_from_Overpass(minlat, maxlat, minlon, maxlon, query):
  ###buffer => 0.01° = 1.11 km
   api = overpy.Overpass()
   
@@ -64,7 +64,7 @@ def location_data_from_Overpass(latitude, longitude, buffer, query):
     node["{}"]
       ({},{},{},{}); 
       out;
-      """.format(query,latitude-buffer,longitude-buffer,latitude+buffer,longitude+buffer)
+      """.format(query,minlat,minlon,maxlat,maxlon)
 
   result = api.query(querystring)
 

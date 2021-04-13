@@ -49,7 +49,14 @@ def print_all_players(conn):
     
     print ("The End")
     
-
+def clear_sim(conn):
+    sql = ''' DELETE FROM PlayMoment;'''
+    cur = conn.cursor()
+    cur.execute(sql)
+    sql= '''DELETE FROM ChallengeInstance;'''
+    cur.execute(sql)
+    conn.commit()
+    return cur.lastrowid
     
 
 
@@ -77,6 +84,7 @@ if __name__ == '__main__':
         game = GameManagement()
         connection = create_connection(DB_PATH)
         game.load(connection)
+        clear_sim(connection)
         sim = Simulation(game)
         sim.sim()
     
@@ -84,7 +92,7 @@ if __name__ == '__main__':
         game = GameManagement()
         connection = create_connection(DB_PATH)
         game.load(connection)
-        plot_players(game.players)    
+        heatmap_moments(game.gameplay_moments)    
         #plotplot()   
 
     elif sys.argv[1] == "analyse":
@@ -96,18 +104,13 @@ if __name__ == '__main__':
     
     elif sys.argv[1] == "populate":
         game = GameManagement()
-        connection = create_connection(DB_PATH)
-        game.populate(connection)
+        connection = create_connection(DB_PATH)        
+        game.create(connection)
         an = Analytics(game)
         an.show_challenges()
     
-    else: print("Use python ./main <create|sim|plot>")
+    else: print("Use python ./main <create|sim|plot|analyse|populate>")
 
 
     
     
-   
-  
-    #add to db
-
-    #normal use cycle

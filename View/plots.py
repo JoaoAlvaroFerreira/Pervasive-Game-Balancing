@@ -111,24 +111,54 @@ def plot_players(players):
     ax.imshow(ruh_m, zorder=0, extent = BBox, aspect= 'equal')
     plt.show()
 
+def heatmap_moments(moments):
+    print(len(moments))
 
-def plot_player_moments(moments):
- 
-    lats = []
-    longs = []
-    for moment in moments:
-        lats.append(moment.latitude)
-        longs.append(moment.longitude)
+    LDN_COORDINATES = (40.2, -4)
+    myMap = folium.Map(location=LDN_COORDINATES, zoom_start=5)
 
-    df = pd.DataFrame([lats, longs]).T
-    df.columns=['Latitude', 'Longitude']
-    ruh_m = plt.imread('Resources/map.png')
-    BBox = (-10.371, 3.735, 35.443, 44.402)
-    fig, ax = plt.subplots(figsize = (8,7))
+    d = {'latitude': [], 'longitude': []}
+    df_acc = pd.DataFrame(data=d)
     
-    ax.scatter(df.Longitude, df.Latitude, zorder=1, alpha= 1, c='b', s=10)
-    ax.set_title('Iberian Peninsula Moments')
-    ax.set_xlim(BBox[0],BBox[1])
-    ax.set_ylim(BBox[2],BBox[3])
-    ax.imshow(ruh_m, zorder=0, extent = BBox, aspect= 'equal')
-    plt.show()
+   
+    # Add marker for Boulder, CO
+    for moment in moments:
+        
+        df2 = pd.DataFrame({'latitude': [moment.latitude], 'longitude': [moment.longitude]})
+        df_acc = df_acc.append(df2)
+        
+    df_acc['latitude'] = df_acc['latitude'].astype(float)
+    df_acc['longitude'] = df_acc['longitude'].astype(float)
+
+
+    heat_df = df_acc[['latitude', 'longitude']]
+    heat_df = heat_df.dropna(axis=0, subset=['latitude','longitude'])
+
+    print(heat_df, "\n")
+
+    # List comprehension to make out list of lists
+    heat_data = [[row['latitude'],row['longitude']] for index, row in heat_df.iterrows()]
+
+    # Plot it on the map
+    HeatMap(heat_data).add_to(myMap)
+
+    myMap.save("map.html")
+    webbrowser.open("map.html")
+
+    
+def plot_moments(moments):
+    LDN_COORDINATES = (40.2, -4)
+    myMap = folium.Map(location=LDN_COORDINATES, zoom_start=5)
+
+  
+    # Add marker for Boulder, CO
+    for moment in moments:
+        folium.Marker(
+            location=[moment.latitude, moment.longitude], # coordinates for the marker (Earth Lab at CU Boulder)
+            popup='Gameplay Moment', # pop-up label for the marker
+            icon=folium.Icon()
+        ).add_to(myMap)
+
+
+    myMap.save("map.html")
+    webbrowser.open("map.html")

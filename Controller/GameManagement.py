@@ -12,9 +12,10 @@ import matplotlib.pyplot as plt
 class GameManagement:
     
     def create(self, conn):
+        self.load(conn)
         self.generatePlayers()
         self.generateGameObjects()
-        self.generateChallenges()
+        self.generateChallenges(40.9229, 41.4201, -8.8248, -7.7193)
         self.gameplay_moments = []
         
 
@@ -41,29 +42,8 @@ class GameManagement:
         
         for ch in self.challenges:
             ch.insert_into_db(conn)
-
-        
-    def plot(self, conn):
-        self.load(conn)
-        longs = [-6,-4,-2]
-        lats = [38,40,43]
-        for player in self.players:
-            lats.append(player.PlayerLocationInfo.latitude)
-            longs.append(player.PlayerLocationInfo.longitude)
-
-        df = pd.DataFrame([lats, longs]).T
-        df.columns=['Latitude', 'Longitude']
-        ruh_m = plt.imread('Resources/map.png')
-        BBox = (-10.371, 3.735, 35.443, 44.402)
-        fig, ax = plt.subplots(figsize = (8,7))
-        
-        ax.scatter(df.Longitude, df.Latitude, zorder=1, alpha= 1, c='b', s=10)
-        ax.set_title('Iberian Peninsula Players')
-        ax.set_xlim(BBox[0],BBox[1])
-        ax.set_ylim(BBox[2],BBox[3])
-        ax.imshow(ruh_m, zorder=0, extent = BBox, aspect= 'equal')
-        plt.show()
-
+            conn.commit()
+ 
 
 
     
@@ -98,22 +78,7 @@ class GameManagement:
             
 
        
-    def sim(self, conn):
-        self.load(conn)
 
-        for player in self.players:
-            self.total_play(player)
-        
-        #for gm in self.gameplay_moments:
-        #    gm.insert_into_db(self.conn)
-        
-        #for chi in self.challenge_instances:
-        #    chi.insert_into_db(self.conn)
-
-    def populate(self, conn):
-        self.load(conn)
-
-        self.spawnPokeStops()
 
 
     def load_game_objects(self):
@@ -138,18 +103,23 @@ class GameManagement:
 
         for row in cur:
             new_cht = ChallengeType(self,row[1], row[2], row[3],row[4], row[5])
-            query = ''' SELECT id, name, startDateAvailable, endDateAvailable, radiusLocationAvailable, radiusLocationVisible, latitude, longitude, itemReward, Multiplayer From Challenge WHERE ChallengeTypeID =={}''' .format(row[0])
+            query = ''' SELECT id, name, startDateAvailable, endDateAvailable, radiusLocationAvailable, radiusLocationVisible, latitude, longitude, itemReward, itemSpend, Multiplayer From Challenge WHERE ChallengeTypeID =={}''' .format(row[0])
             cur2 = self.conn.execute(query)
             
             self.challengeTypes.append(new_cht)
             for row2 in cur2:
-                new_ch = Challenge(new_cht, row2[1], row2[2], row2[3],row2[4],row2[5],row2[6],row2[7], None, row2[9])
+                new_ch = Challenge(new_cht, row2[1], row2[2], row2[3],row2[4],row2[5],row2[6],row2[7], None, None, row2[10])
                 new_ch.id = row2[0]
                
                
                 query = ('''SELECT name FROM GameObject WHERE id == {}'''.format(row2[8]))
                 go_name = self.conn.execute(query)
                 new_ch.itemReward = self.find_object(go_name)
+                self.challenges.append(new_ch)
+
+                query = ('''SELECT name FROM GameObject WHERE id == {}'''.format(row2[9]))
+                go_name = self.conn.execute(query)
+                new_ch.itemSpend = self.find_object(go_name)
                 self.challenges.append(new_ch)
 
     
@@ -180,47 +150,87 @@ class GameManagement:
         self.gameObjects = []
 
         self.gameObjectTypes.append(GameObjectType(self, "Pokemon", 5))
-        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Pokemon", False ))
+        self.gameObjectTypes.append(GameObjectType(self, "Consumable", 2))
+        self.gameObjectTypes.append(GameObjectType(self, "Cosmetic", 1))
+        self.gameObjectTypes.append(GameObjectType(self, "PokeBall", 3))
+        
+        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Pikachu", False ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Charizard", False ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Mewtwo", False ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Abra", False ))
 
-    def generateChallenges(self):
+    
+        self.gameObjects.append(GameObject(self.gameObjectTypes[1], "Encounter Booster", False ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[1], "EasyRaid", False ))
+
+        
+        self.gameObjects.append(GameObject(self.gameObjectTypes[2], "Jacket", False ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[2], "Hat", False ))
+
+        
+        self.gameObjects.append(GameObject(self.gameObjectTypes[3], "PokeBall", False ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[3], "SuperBall", False ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[3], "UltraBall", False ))
+        
+
+
+
+
+
+    def generateChallenges(self, minlat, maxlat, minlon, maxlon):
         self.challengeTypes = []
         self.challenges = []
 
         self.challengeTypes.append(ChallengeType(self, "PokeStops", False, False, True, False))
         self.challengeTypes.append(ChallengeType(self,"PokemonCatch", True, False, False, False))
-        self.challengeTypes.append(ChallengeType("Missions", True, True, True, True, True))
+        self.challengeTypes.append(ChallengeType(self,"Missions", True, True, True, True))
         
-        #for player in self.players:
-            #self.spawnPokemon(player)    
+        self.spawnPokemon(minlat, maxlat, minlon, maxlon)
+        self.spawnPokeStops(minlat, maxlat, minlon, maxlon)
+        
+        self.spawnRaids(minlat, maxlat, minlon, maxlon)
+
+        for player in self.players:
+            self.spawnMissions(player)    
    
-    def spawnPokemon(self):
+    def spawnPokemon(self, minlat, maxlat, minlon, maxlon):
         self.challenges = []
         load_file = 'D:\\School\\5oAno\\TESE\Repo\\Pervasive-Game-Balancing\\Resources\\CountryDistributionCSVs\PRT_population.csv'
               
         df_acc = pd.read_csv(load_file)
-        df_acc = df_acc[df_acc['population']>40] # Reducing data size so it runs faster
-        df_acc = df_acc[(df_acc['latitude'] > 41) & (df_acc['latitude'] < 42)]
-        df_acc = df_acc[(df_acc['longitude'] > -9) & (df_acc['longitude'] < -8)]
+        df_acc = df_acc[df_acc['population']>5] # Reducing data size so it runs faster
+        df_acc = df_acc[(df_acc['latitude'] > minlat) & (df_acc['latitude'] < maxlat)]
+        df_acc = df_acc[(df_acc['longitude'] > minlon) & (df_acc['longitude'] < maxlon)]
         # Add marker for Boulder, CO
         for index, row in df_acc.iterrows():
-            a = Challenge(self.challengeTypes[1], "Catch Pokemon", 0, 0, 0.01,0.1, row['latitude'], row['longitude'], self.gameObjects[0], False)
+            a = Challenge(self.challengeTypes[1], "Catch Pokemon", 0, 0, 0.01,0.1, row['latitude'], row['longitude'], self.gameObjects[0], self.gameObjects[8], False)
             self.challenges.append(a)
         
     
     
-    def spawnPokeStops(self): #rework
-        nodes = location_data_from_Overpass(41,-8.5, 0.5, "public_transport")
+    def spawnPokeStops(self, minlat, maxlat, minlon, maxlon): #rework
+        nodes = location_data_from_Overpass(minlat, maxlat, minlon, maxlon, "public_transport")
         
         for node in nodes:
-            a = Challenge(self.challengeTypes[0], "PokeStop Metro", 0,0, 0.01,0.1, node.lat, node.lon, "No Reward", False)
+            a = Challenge(self.challengeTypes[0], "PokeStop Metro", 0,0, 0.01,0.1, node.lat, node.lon, self.gameObjects[8],None, False)
             self.challenges.append(a)
-           
+        
+        
+        nodes = location_data_from_Overpass(minlat, maxlat, minlon, maxlon, "tourism")
+        
+        for node in nodes:
+            a = Challenge(self.challengeTypes[0], "PokeStop Landmark", 0,0, 0.01,0.1, node.lat, node.lon, self.gameObjects[9], None, False)
+            self.challenges.append(a)
+
+    
+    def spawnRaids(self, minlat, maxlat, minlon, maxlon):
+        print("TO DO RAIDS")
     
     def spawnMissions(self,player): #rework
         for _ in range(0,5):
             rand_mod_a = random.uniform(-0.2,0.2)
             rand_mod_b  = random.uniform(-0.2,0.2)
-            a = Challenge(self.challengeTypes[2], "Starter mission", 0, 0, 0,0, player.PlayerLocationInfo.latitude, player.PlayerLocationInfo.longitude, "No Reward", False)
+            a = Challenge(self.challengeTypes[2], "Starter mission", 0, 0, 0,0, player.PlayerLocationInfo.latitude, player.PlayerLocationInfo.longitude,self.gameObjects[4], self.gameObjects[0], False)
             self.challenges.append(a)
         
         

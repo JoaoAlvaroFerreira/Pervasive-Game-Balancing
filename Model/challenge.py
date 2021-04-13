@@ -30,6 +30,7 @@ class Challenge:
     latitude,
     longitude,
     itemReward,
+    itemSpend,
     Multiplayer ):
         self.ChallengeType = ChallengeType
         self.name = name
@@ -40,10 +41,11 @@ class Challenge:
         self.latitude = latitude
         self.longitude = longitude
         self.itemReward = itemReward
+        self.itemSpend = itemSpend
         self.Multiplayer = Multiplayer
 
 
-    def insert_into_db(self,conn):
+    def insert_into_db(self,cur):
         query = ''' SELECT id FROM ChallengeType WHERE name == "{}"''' .format(self.ChallengeType.name)
         cur = conn.execute(query)
         for row in cur:
@@ -54,13 +56,17 @@ class Challenge:
         for row in cur:
             go_id = row[0]
         
+        query = ''' SELECT id FROM GameObject WHERE name == "{}"''' .format(self.itemSpend.name)
+        cur = conn.execute(query)
+        for row in cur:
+            goS_id = row[0]
+        
 
 
-        sql = ''' INSERT INTO Challenge(ChallengeTypeID, name, startDateAvailable, endDateAvailable, radiusLocationAvailable, radiusLocationVisible, latitude, longitude, itemReward, Multiplayer)
-                VALUES("{}","{}","{}","{}","{}","{}","{}","{}","{}","{}") '''.format(cht_id,self.name, self.startDateAvailable, self.endDateAvailable, self.radiusLocationAvailable, self.radiusLocationVisible, self.latitude, self.longitude, go_id, self.Multiplayer)
+        sql = ''' INSERT INTO Challenge(ChallengeTypeID, name, startDateAvailable, endDateAvailable, radiusLocationAvailable, radiusLocationVisible, latitude, longitude, itemReward, itemSpend, Multiplayer)
+                VALUES("{}","{}","{}","{}","{}","{}","{}","{}","{}","{}","{}") '''.format(cht_id,self.name, self.startDateAvailable, self.endDateAvailable, self.radiusLocationAvailable, self.radiusLocationVisible, self.latitude, self.longitude, go_id, goS_id, self.Multiplayer)
         cur = conn.cursor()
         cur.execute(sql)
-        conn.commit()
         self.id = cur.lastrowid                
         return cur.lastrowid
 
