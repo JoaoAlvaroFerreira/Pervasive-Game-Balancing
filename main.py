@@ -92,7 +92,7 @@ if __name__ == '__main__':
         game = GameManagement()
         connection = create_connection(DB_PATH)
         game.load(connection)
-        heatmap_moments(game.gameplay_moments)    
+        heatmap_moments(game.challenges)    
         #plotplot()   
 
     elif sys.argv[1] == "analyse":

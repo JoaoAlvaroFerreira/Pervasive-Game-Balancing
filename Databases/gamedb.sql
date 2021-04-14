@@ -2,7 +2,8 @@ DROP TABLE IF EXISTS Player;
 DROP TABLE IF EXISTS Personality;
 DROP TABLE IF EXISTS Demographic;
 DROP TABLE IF EXISTS PlayerLocationInfo;
-DROP TABLE IF EXISTS PlayMoment; --to do
+DROP TABLE IF EXISTS CommuteLocationInfo;
+DROP TABLE IF EXISTS PlayMoment;
 ------
 DROP TABLE IF EXISTS Game;
 DROP TABLE IF EXISTS ChallengeType;
@@ -133,7 +134,6 @@ CREATE TABLE IF NOT EXISTS PlayMoment(
 );
 
 
-
 CREATE TABLE IF NOT EXISTS ChallengeInstance (
 	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	ChallengeID int NOT NULL,
@@ -146,11 +146,16 @@ CREATE TABLE IF NOT EXISTS ChallengeInstance (
 );
 
 CREATE TABLE IF NOT EXISTS Inventory(
+	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
 	playerID int NOT NULL,
 	GameObjectID int NOT NULL,
 	FOREIGN KEY (GameObjectID) REFERENCES GameObject (id),
 	FOREIGN KEY (playerID) REFERENCES Player (id)
 );
+
+CREATE TABLE IF NOT EXISTS Purchase();
+
+
 /*
 CREATE TABLE IF NOT EXISTS ChallengeTarget(
 	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -184,12 +189,6 @@ CREATE TABLE IF NOT EXISTS GameObjectInstance(
 	FOREIGN KEY (spentIn) REFERENCES ChallengeInstance (id)
 );
 
-CREATE TABLE IF NOT EXISTS Inventory(
-	playerID int NOT NULL,
-	gameObjectInstanceID int NOT NULL,
-	FOREIGN KEY (gameObjectInstanceID) REFERENCES GameObjectInstance (id),
-	FOREIGN KEY (playerID) REFERENCES Player (id)
-);
 
 CREATE TABLE IF NOT EXISTS Wallet(
 	playerID int NOT NULL,

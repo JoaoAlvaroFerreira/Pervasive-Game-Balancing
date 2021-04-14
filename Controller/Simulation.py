@@ -47,8 +47,8 @@ class Simulation:
      
 
         while a < 2:
-            rand_mod_a = random.uniform(-0.05,0.05)
-            rand_mod_b  = random.uniform(-0.05,0.05)
+            rand_mod_a = random.uniform(-0.03,0.02)
+            rand_mod_b  = random.uniform(-0.03,0.02)
             curr_lat = curr_lat + rand_mod_a
             curr_long = curr_long + rand_mod_b
 
@@ -86,14 +86,30 @@ class Simulation:
         for ch in doable_challenges:
             if ch.ChallengeType.temporary:
                 if self.verify_done(ch, player):
+                    print("VERIFIED!!!")
                     continue
             
-            chi = ChallengeInstance(ch, True, True , player,datetime)
+            if self.doChallenge(ch, player):
+                chi = ChallengeInstance(ch, True, True , player,datetime)
+                print("DID CHALLENGE")
+                inv = Inventory(player,ch.itemReward)
+                inv.insert_into_db(self.game.conn)
+                self.game.inventories.append(inv)
+            else:
+                chi = ChallengeInstance(ch, True, False , player,datetime)
+
             chi.insert_into_db(self.game.conn)
             self.game.challenge_instances.append(chi)
             return 1
         
         return 0
+        
+    def doChallenge(self,ch, player):
+        if ch.itemSpend is None:
+            return True
+
+        else:
+            return self.game.find_object_in_inventory(player, ch.itemSpend)
         
 
     def verify_done(self, ch, player):

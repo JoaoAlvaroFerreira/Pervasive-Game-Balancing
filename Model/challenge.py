@@ -45,21 +45,26 @@ class Challenge:
         self.Multiplayer = Multiplayer
 
 
-    def insert_into_db(self,cur):
+    def insert_into_db(self,conn):
         query = ''' SELECT id FROM ChallengeType WHERE name == "{}"''' .format(self.ChallengeType.name)
         cur = conn.execute(query)
         for row in cur:
             cht_id = row[0]
         
-        query = ''' SELECT id FROM GameObject WHERE name == "{}"''' .format(self.itemReward.name)
-        cur = conn.execute(query)
-        for row in cur:
-            go_id = row[0]
+        if self.itemReward is not None:
+            query = ''' SELECT id FROM GameObject WHERE name == "{}"''' .format(self.itemReward.name)
+            cur = conn.execute(query)
+            for row in cur:
+                go_id = row[0]
+        else: 
+            go_id = None
         
-        query = ''' SELECT id FROM GameObject WHERE name == "{}"''' .format(self.itemSpend.name)
-        cur = conn.execute(query)
-        for row in cur:
-            goS_id = row[0]
+        if self.itemSpend is not None:
+            query = ''' SELECT id FROM GameObject WHERE name == "{}"''' .format(self.itemSpend.name)
+            cur = conn.execute(query)
+            for row in cur:
+                goS_id = row[0]
+        else: goS_id = None
         
 
 

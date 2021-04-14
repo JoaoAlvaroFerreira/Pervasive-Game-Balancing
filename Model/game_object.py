@@ -44,9 +44,20 @@ class GameObjectInstance:
         self.rewardFor = rewardFor
 
 class Inventory:
-    def __init__(self,Player, GameObjectInstance):
+    def __init__(self,Player, GameObject):
         self.Player = Player
-        self.GameObjectInstance = GameObjectInstance
+        self.GameObject = GameObject
+
+    def insert_into_db(self,conn):
+        
+        sql = ''' INSERT INTO Inventory(playerID, GameObjectID)
+                VALUES("{}","{}") '''.format(self.Player.id, self.GameObject.id)
+        cur = conn.cursor()
+        cur.execute(sql)
+        conn.commit()        
+        self.id = cur.lastrowid
+        return cur.lastrowid
+
 
 class Wallet:
     def __init__(self,player, Currency):

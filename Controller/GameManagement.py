@@ -15,7 +15,7 @@ class GameManagement:
         self.load(conn)
         self.generatePlayers()
         self.generateGameObjects()
-        self.generateChallenges(40.9229, 41.4201, -8.8248, -7.7193)
+        self.generateChallenges(41.0203, 41.2551, -8.7286, -8.3496)
         self.gameplay_moments = []
         
 
@@ -54,6 +54,7 @@ class GameManagement:
         self.load_challenges()
         self.gameplay_moments = []
         self.challenge_instances = []
+        self.inventories = []
 
         cur = conn.execute(''' SELECT id, name from Player''' )
         for row in cur:
@@ -72,6 +73,14 @@ class GameManagement:
                 ch =  self.find_challenge(row3[1])
                 new_chi = ChallengeInstance(ch, row3[2],row3[3], new_p, row3[4])
                 self.challenge_instances.append(new_chi)
+
+            sql = ''' SELECT id, GameObjectID FROM Inventory WHERE playerID == {} '''.format(row[0])
+            cur4 = conn.execute(sql)
+            for row4 in cur4:
+                obj = self.find_object(row4[1])
+                new_inv = Inventory(new_p,obj)
+                obj.id = row4[0]
+                self.inventories.append(new_inv)
       
 
        
@@ -88,11 +97,13 @@ class GameManagement:
 
         for row in cur:
             new_got = GameObjectType(self,row[1], row[2])
+            new_got.id = row[0]
             query = ''' SELECT id, name, keyItem from GameObject WHERE gameObjectTypeID =={}''' .format(row[0])
             cur2 = self.conn.execute(query)
             self.gameObjectTypes.append(new_got)
             for row2 in cur2:
                 new_go = GameObject(new_got, row2[1], row2[2])
+                new_go.id = row2[0]
                 self.gameObjects.append(new_go)
                 
 
@@ -111,25 +122,30 @@ class GameManagement:
                 new_ch = Challenge(new_cht, row2[1], row2[2], row2[3],row2[4],row2[5],row2[6],row2[7], None, None, row2[10])
                 new_ch.id = row2[0]
                
-               
-                query = ('''SELECT name FROM GameObject WHERE id == {}'''.format(row2[8]))
-                go_name = self.conn.execute(query)
-                new_ch.itemReward = self.find_object(go_name)
+            
+                new_ch.itemReward = self.find_object(row2[8])
                 self.challenges.append(new_ch)
 
-                query = ('''SELECT name FROM GameObject WHERE id == {}'''.format(row2[9]))
-                go_name = self.conn.execute(query)
-                new_ch.itemSpend = self.find_object(go_name)
+               
+                new_ch.itemSpend = self.find_object(row2[9])
                 self.challenges.append(new_ch)
 
     
-    def find_object(self,name):
+    def find_object(self,id):
         
         for obj in self.gameObjects:
-            if obj.name == name:
+            if obj.id == id:
                 return obj
         
         return None
+
+    def find_object_in_inventory(self, player, obj):
+        
+        for inv in self.inventories:
+            if inv.GameObject.name == obj.name:
+                return True
+            
+        return False
 
     def find_challenge(self, id):
         for challenge in self.challenges:
@@ -198,7 +214,7 @@ class GameManagement:
         load_file = 'D:\\School\\5oAno\\TESE\Repo\\Pervasive-Game-Balancing\\Resources\\CountryDistributionCSVs\PRT_population.csv'
               
         df_acc = pd.read_csv(load_file)
-        df_acc = df_acc[df_acc['population']>5] # Reducing data size so it runs faster
+        df_acc = df_acc[df_acc['population']>40] # Reducing data size so it runs faster
         df_acc = df_acc[(df_acc['latitude'] > minlat) & (df_acc['latitude'] < maxlat)]
         df_acc = df_acc[(df_acc['longitude'] > minlon) & (df_acc['longitude'] < maxlon)]
         # Add marker for Boulder, CO
