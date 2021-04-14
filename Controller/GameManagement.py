@@ -55,6 +55,7 @@ class GameManagement:
         self.gameplay_moments = []
         self.challenge_instances = []
         self.inventories = []
+        self.purchases = []
 
         cur = conn.execute(''' SELECT id, name from Player''' )
         for row in cur:
@@ -81,6 +82,14 @@ class GameManagement:
                 new_inv = Inventory(new_p,obj)
                 obj.id = row4[0]
                 self.inventories.append(new_inv)
+            
+            sql = ''' SELECT id, GameObjectID, purchase_timestamp FROM Purchase WHERE playerID == {} '''.format(row[0])
+            cur5 = conn.execute(sql)
+            for row5 in cur5:
+                obj = self.find_object(row5[1])
+                new_purchase = Inventory(new_p,obj, row[2])
+                obj.id = row4[0]
+                self.purchases.append(new_purchase)
       
 
        
@@ -98,11 +107,11 @@ class GameManagement:
         for row in cur:
             new_got = GameObjectType(self,row[1], row[2])
             new_got.id = row[0]
-            query = ''' SELECT id, name, keyItem from GameObject WHERE gameObjectTypeID =={}''' .format(row[0])
+            query = ''' SELECT id, name, keyItem, price from GameObject WHERE gameObjectTypeID =={}''' .format(row[0])
             cur2 = self.conn.execute(query)
             self.gameObjectTypes.append(new_got)
             for row2 in cur2:
-                new_go = GameObject(new_got, row2[1], row2[2])
+                new_go = GameObject(new_got, row2[1], row2[2], row2[3])
                 new_go.id = row2[0]
                 self.gameObjects.append(new_go)
                 
@@ -170,23 +179,23 @@ class GameManagement:
         self.gameObjectTypes.append(GameObjectType(self, "Cosmetic", 1))
         self.gameObjectTypes.append(GameObjectType(self, "PokeBall", 3))
         
-        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Pikachu", False ))
-        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Charizard", False ))
-        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Mewtwo", False ))
-        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Abra", False ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Pikachu", False, None ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Charizard", False, None ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Mewtwo", False, None))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[0], "Abra", False, None))
 
     
-        self.gameObjects.append(GameObject(self.gameObjectTypes[1], "Encounter Booster", False ))
-        self.gameObjects.append(GameObject(self.gameObjectTypes[1], "EasyRaid", False ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[1], "Encounter Booster", False, 2 ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[1], "EasyRaid", False, 3))
 
         
-        self.gameObjects.append(GameObject(self.gameObjectTypes[2], "Jacket", False ))
-        self.gameObjects.append(GameObject(self.gameObjectTypes[2], "Hat", False ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[2], "Jacket", False, 4 ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[2], "Hat", False, 5 ))
 
         
-        self.gameObjects.append(GameObject(self.gameObjectTypes[3], "PokeBall", False ))
-        self.gameObjects.append(GameObject(self.gameObjectTypes[3], "SuperBall", False ))
-        self.gameObjects.append(GameObject(self.gameObjectTypes[3], "UltraBall", False ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[3], "PokeBall", False, 1 ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[3], "SuperBall", False ,2 ))
+        self.gameObjects.append(GameObject(self.gameObjectTypes[3], "UltraBall", False, 3 ))
         
 
 

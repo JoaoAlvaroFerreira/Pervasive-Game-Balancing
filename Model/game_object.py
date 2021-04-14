@@ -17,10 +17,11 @@ class GameObjectType:
 
 
 class GameObject:
-    def __init__(self,GameObjectType, name, keyItem):
+    def __init__(self,GameObjectType, name, keyItem, price):
         self.GameObjectType = GameObjectType
         self.name = name
         self.keyItem = keyItem
+        self.price = price
 
     def insert_into_db(self,conn):
         query = '''SELECT id FROM GameObjectType WHERE name == "{}"'''.format(self.GameObjectType.name)
@@ -28,8 +29,8 @@ class GameObject:
         for row in cur:
             got_id = row[0]
 
-        sql = ''' INSERT INTO GameObject(gameObjectTypeID, name, keyItem)
-                VALUES("{}","{}","{}") '''.format(got_id,self.name, self.keyItem)
+        sql = ''' INSERT INTO GameObject(gameObjectTypeID, name, keyItem, price)
+                VALUES("{}","{}","{}","{}") '''.format(got_id,self.name, self.keyItem, self.price)
         cur = conn.cursor()
         cur.execute(sql)
         conn.commit()        
@@ -70,9 +71,17 @@ class StoreItem:
         self.GameObject = GameObject
 
 class Purchase:
-    def __init__(self, StoreItem, Player, TimeStamp, CurrencyUsed, Cosmetic):
-        self.StoreItem = StoreItem
+    def __init__(self, Player, GameObject, TimeStamp):
+        self.GameObject = GameObject
         self.Player = Player
         self.TimeStamp = TimeStamp
-        self.CurrencyUsed = CurrencyUsed
-        self.Cosmetic = Cosmetic
+    
+    def insert_into_db(self,conn):
+        
+        sql = ''' INSERT INTO Purchase(playerID, GameObjectID, purchase_timestamp)
+                VALUES("{}","{}","{}") '''.format(self.Player.id, self.GameObject.id, self.TimeStamp)
+        cur = conn.cursor()
+        cur.execute(sql)
+        conn.commit()        
+        self.id = cur.lastrowid
+        return cur.lastrowid

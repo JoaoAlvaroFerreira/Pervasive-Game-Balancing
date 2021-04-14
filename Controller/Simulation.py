@@ -82,7 +82,11 @@ class Simulation:
 
     def do_challenges(self, doable_challenges, player, datetime):
               
-
+        purchase = Purchase(player, self.game.gameObjects[8], datetime)
+        print("Price: ")
+        print(self.game.gameObjects[8].price)
+        self.game.purchases.append(purchase)
+        purchase.insert_into_db(self.game.conn)
         for ch in doable_challenges:
             if ch.ChallengeType.temporary:
                 if self.verify_done(ch, player):

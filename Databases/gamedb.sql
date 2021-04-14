@@ -120,6 +120,7 @@ CREATE TABLE IF NOT EXISTS GameObject(
 	gameObjectTypeID int NOT NULL,
 	name text NOT NULL,
 	keyItem boolean,
+	price int,
 	FOREIGN KEY (gameObjectTypeID) REFERENCES GameObjectType (id)
 );
 
@@ -153,7 +154,14 @@ CREATE TABLE IF NOT EXISTS Inventory(
 	FOREIGN KEY (playerID) REFERENCES Player (id)
 );
 
-CREATE TABLE IF NOT EXISTS Purchase();
+CREATE TABLE IF NOT EXISTS Purchase(
+	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+	playerID int NOT NULL,
+	GameObjectID int NOT NULL,
+	purchase_timestamp DATE NOT NULL,
+	FOREIGN KEY (GameObjectID) REFERENCES GameObject (id),
+	FOREIGN KEY (playerID) REFERENCES Player (id)
+);
 
 
 /*
