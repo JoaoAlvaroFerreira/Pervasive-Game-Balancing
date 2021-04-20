@@ -18,48 +18,85 @@ class Simulation:
         for player in self.game.players:
             self.total_play(player)
 
+    def decision(self,probability):
+        return random.random() < probability
     
     def total_play(self,player):
-        player.motivation = player.Personality.Competitiveness
+        player.base_motivation = random.uniform(0,5)
+        player.session = 0
         date =  datetime.datetime(2021, 1, 1,0,0)
         i = 0
-        for _ in range(1, 365):
+        for _ in range(1, 14):
             
-            date = date + datetime.timedelta(hours = 1)
+            date = date + datetime.timedelta(days = 1)
             load_file = 'D:\\School\\5oAno\\TESE\Repo\\Pervasive-Game-Balancing\\Resources\\weather.csv'
             df = pd.read_csv(load_file)
             today = df.loc[df['Day'] == date.timetuple().tm_yday]
             print("The weather is:"+today['Weather'])
 
-            if player.motivation > 1:
-                i = i+1
-                self.gameplay_session(player, date, i)
+            player.base_motivation = player.base_motivation + self.decision(0.2)
 
-            print(date)
-            print("Concentration: ")
-            print(player.Personality.Concentration)
+            if date.weekday() is 5 or date.weekday() is 6:
+                weekend = True
+            played_today = True
 
-    def gameplay_session(self,player, datetime, i):
+            for hour in range(0,24):
+                
+                now = date + datetime.timedelta(hours=hour)
+                hour = hour + 1
+
+                if played_today:
+                    if self.decision(player.base_motivation/50):
+                        print("play again")
+                        played_today = False
+
+               
+
+                if hour > 8 or hour < 22:
+                    if player.base_motivation > 3:
+                        if weekend:
+                            if self.decision(player.Personality.Competitiveness/10):
+                                print("Play!")
+                                self.gameplay_session(player,date)
+                        
+                
+
+          
+           # if player.base_motivation > 1:
+            #    i = i+1
+             #   self.gameplay_session(player, date, i)
+
+           
+            
+            
+
+    def gameplay_session(self,player, datetime):
         
         curr_lat = player.PlayerLocationInfo.latitude
         curr_long = player.PlayerLocationInfo.longitude
-        a = 0
+        
+        player.session = player.session + 1
      
+        local_motivation = player.base_motivation
 
-        while a < 2:
+        while(local_motivation > 0):
             rand_mod_a = random.uniform(-0.03,0.02)
             rand_mod_b  = random.uniform(-0.03,0.02)
             curr_lat = curr_lat + rand_mod_a
             curr_long = curr_long + rand_mod_b
 
-            self.game.create_moment(player, curr_lat, curr_long, datetime, i) 
-            a = a+1
+            self.game.create_moment(player, curr_lat, curr_long, datetime, player.session) 
+        
 
             doable_challenges = self.find_doable_challenge_location(curr_lat, curr_long)
             #visible_challenges = self.find_visible_challenge_location(curr_lat, curr_long)
 
             if len(doable_challenges) > 0:
-                a = a - self.do_challenges(doable_challenges, player, datetime)
+                player.base_motivation = player.base_motivation + self.do_challenges(doable_challenges, player, datetime)
+            
+            local_motivation = local_motivation - 3
+            
+   
                 
 
 
@@ -90,7 +127,6 @@ class Simulation:
         for ch in doable_challenges:
             if ch.ChallengeType.temporary:
                 if self.verify_done(ch, player):
-                    print("VERIFIED!!!")
                     continue
             
             if self.doChallenge(ch, player):
@@ -106,7 +142,7 @@ class Simulation:
             self.game.challenge_instances.append(chi)
             return 1
         
-        return 0
+        return -1
         
     def doChallenge(self,ch, player):
         if ch.itemSpend is None:

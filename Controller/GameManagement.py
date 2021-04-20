@@ -80,15 +80,15 @@ class GameManagement:
             for row4 in cur4:
                 obj = self.find_object(row4[1])
                 new_inv = Inventory(new_p,obj)
-                obj.id = row4[0]
+                new_inv.id = row4[0]
                 self.inventories.append(new_inv)
             
             sql = ''' SELECT id, GameObjectID, purchase_timestamp FROM Purchase WHERE playerID == {} '''.format(row[0])
             cur5 = conn.execute(sql)
             for row5 in cur5:
                 obj = self.find_object(row5[1])
-                new_purchase = Inventory(new_p,obj, row[2])
-                obj.id = row4[0]
+                new_purchase = Purchase(new_p,obj, row5[2])
+                new_purchase.id = row5[0]
                 self.purchases.append(new_purchase)
       
 

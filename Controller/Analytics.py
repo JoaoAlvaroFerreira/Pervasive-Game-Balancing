@@ -17,18 +17,19 @@ class Analytics:
     
     def analyse_players(self):
         
-        plotplot(self.game.players)
+        #plotplot(self.game.players)
         
         for player in self.game.players:
             a = self.get_player_challenges(player)
             b = self.get_player_moments(player)
-            
+      
             
             distance = self.measure_distances(b)
             player.distance = distance
-            string = "Player {} engaged with {} challenges and has {} recorded play moments, in a total of {} play sessions. He has walked a total of {} Km".format(player.name,len(a),len(b), b[len(b)-1].session,distance)
+            if(len(b)>0):
+                string = "Player {} engaged with {} challenges and has {} recorded play moments, in a total of {} play sessions. He has walked a total of {} Km".format(player.name,len(a),len(b),b[-1].session ,distance)
 
-            print(string )
+                print(string )
         #print(len(self.game.gameplay_moments))
         
     def get_player_moments(self, player):
@@ -51,6 +52,7 @@ class Analytics:
     def measure_distances(self, moment_list):
         value_distance = 0
         for x in range(len(moment_list)-1):
+            
             if(moment_list[x].session == moment_list[x+1].session):
                 value_distance = value_distance + self.calc_distance_two_moments(moment_list[x],moment_list[x+1])
 
