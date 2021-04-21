@@ -3,6 +3,7 @@ from Model.player import *
 from Model.game_object import *
 from Model.challenge import *
 from Model.game import *
+from Resources.API import *
 import datetime
 import random
 import pandas as pd
@@ -19,7 +20,9 @@ class Simulation:
             self.total_play(player)
 
     def decision(self,probability):
-        return random.random() < probability
+        a = random.random()
+        
+        return a < probability
     
     def total_play(self,player):
         player.base_motivation = random.uniform(0,5)
@@ -32,36 +35,114 @@ class Simulation:
             load_file = 'D:\\School\\5oAno\\TESE\Repo\\Pervasive-Game-Balancing\\Resources\\weather.csv'
             df = pd.read_csv(load_file)
             today = df.loc[df['Day'] == date.timetuple().tm_yday]
-            print("The weather is:"+today['Weather'])
+            weather = print(today['Weather'])
+
 
             player.base_motivation = player.base_motivation + self.decision(0.2)
 
-            if date.weekday() is 5 or date.weekday() is 6:
+            if date.weekday() == 5 or date.weekday() == 6:
                 weekend = True
-            played_today = True
 
+           
+
+            played_today = True
+            playval = player.base_motivation + player.Personality.Competitiveness + player.Personality.Immersion
+                #Rain, Cloudy, Sunny, Storm, Very Sunny
+            if weather == "Sunny":
+                playval = playval + 1
+            
+            elif weather == "Cloudy":
+                playval = playval - 1
+            
+            elif weather == "Rain":
+                playval = playval - 4
+            
+            elif weather == "Storm":
+                playval = 0
+
+            elif weather == "Very Sunny":
+                playval = playval + 3
+
+            if is_holiday(date):
+                weekend = True
+                playval = playval + 1
+                
+            
             for hour in range(0,24):
                 
                 now = date + datetime.timedelta(hours=hour)
                 hour = hour + 1
-
-                if played_today:
-                    if self.decision(player.base_motivation/50):
-                        print("play again")
-                        played_today = False
-
-               
-
-                if hour > 8 or hour < 22:
-                    if player.base_motivation > 3:
-                        if weekend:
-                            if self.decision(player.Personality.Competitiveness/10):
-                                print("Play!")
-                                self.gameplay_session(player,date)
-                        
                 
 
-          
+                if played_today:
+                   
+                    if self.decision(player.base_motivation/100):
+                        
+                        played_today = False
+                    
+                    
+
+               
+                if not played_today:
+                    
+                    
+                    if player.Demographic.Age == "Kid" and hour > 8 and hour < 20:
+                        if weekend:
+                            if player.base_motivation > 3:
+                                if self.decision(playval/10):
+                                    print("Play!")
+                                    self.gameplay_session(player,date)
+                                    played_today = True
+                        else: 
+                            if player.base_motivation > 4:
+                                if self.decision(playval/10):
+                                    print("Play!")
+                                    self.gameplay_session(player,date)
+                                    played_today = True
+
+                    if player.Demographic.Age == "Young" and hour > 8:
+                        if weekend:
+                            if player.base_motivation > 4:
+                                if self.decision(playval/10):
+                                    print("Play!")
+                                    self.gameplay_session(player,date)
+                                    played_today = True
+                        else: 
+                            if player.base_motivation > 4:
+                                if self.decision(playval/10):
+                                    print("Play!")
+                                    self.gameplay_session(player,date)
+                                    played_today = True
+
+
+                    if player.Demographic.Age == "Adult" and hour > 8 and hour < 22:
+                        if weekend:
+                            if player.base_motivation > 3:
+                                if self.decision(playval/10):
+                                    print("Play!")
+                                    self.gameplay_session(player,date)
+                                    played_today = True
+                        else: 
+                            if player.base_motivation > 5:
+                                if self.decision(playval/10):
+                                    print("Play!")
+                                    self.gameplay_session(player,date)
+                                    played_today = True
+                    
+                    if player.Demographic.Age == "Elderly" and hour > 5 and hour < 18:
+                        if weekend:
+                            if player.base_motivation > 3:
+                                if self.decision(playval/10):
+                                    print("Play!")
+                                    self.gameplay_session(player,date)
+                                    played_today = True
+                        else: 
+                            if player.base_motivation > 4:
+                                if self.decision(playval/10):
+                                    print("Play!")
+                                    self.gameplay_session(player,date)
+                                    played_today = True
+                                    
            # if player.base_motivation > 1:
             #    i = i+1
              #   self.gameplay_session(player, date, i)
@@ -119,11 +200,11 @@ class Simulation:
 
     def do_challenges(self, doable_challenges, player, datetime):
               
-        purchase = Purchase(player, self.game.gameObjects[8], datetime)
-        print("Price: ")
-        print(self.game.gameObjects[8].price)
-        self.game.purchases.append(purchase)
-        purchase.insert_into_db(self.game.conn)
+        #purchase = Purchase(player, self.game.gameObjects[8], datetime)
+        #print("Price: ")
+        #print(self.game.gameObjects[8].price)
+        #self.game.purchases.append(purchase)
+        #purchase.insert_into_db(self.game.conn)
         for ch in doable_challenges:
             if ch.ChallengeType.temporary:
                 if self.verify_done(ch, player):

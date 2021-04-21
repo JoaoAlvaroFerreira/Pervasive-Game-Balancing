@@ -59,7 +59,27 @@ def clear_sim(conn):
     return cur.lastrowid
     
 
+def create():
+    game = GameManagement()
+    connection = create_connection(DB_PATH)
+    create_tables(connection)
+    insert_game(connection)
+    game.create(connection)
 
+def sim():
+    game = GameManagement()
+    connection = create_connection(DB_PATH)
+    game.load(connection)
+    clear_sim(connection)
+    sim = Simulation(game)
+    sim.sim()
+
+def analyse():
+    game = GameManagement()
+    connection = create_connection(DB_PATH)
+    game.load(connection)
+    an = Analytics(game)
+    an.analyse_players() 
 
 if __name__ == '__main__':
 
@@ -74,19 +94,10 @@ if __name__ == '__main__':
         exit()
 
     if sys.argv[1] == "create":
-        game = GameManagement()
-        connection = create_connection(DB_PATH)
-        create_tables(connection)
-        insert_game(connection)
-        game.create(connection)
+       create()
 
     elif sys.argv[1] == "sim":
-        game = GameManagement()
-        connection = create_connection(DB_PATH)
-        game.load(connection)
-        clear_sim(connection)
-        sim = Simulation(game)
-        sim.sim()
+        sim()
     
     elif sys.argv[1] == "plot":
         game = GameManagement()
@@ -96,11 +107,7 @@ if __name__ == '__main__':
         #plotplot()   
 
     elif sys.argv[1] == "analyse":
-        game = GameManagement()
-        connection = create_connection(DB_PATH)
-        game.load(connection)
-        an = Analytics(game)
-        an.analyse_players() 
+        analyse()
     
     elif sys.argv[1] == "populate":
         game = GameManagement()
@@ -108,6 +115,11 @@ if __name__ == '__main__':
         game.create(connection)
         an = Analytics(game)
         an.show_challenges()
+    
+    elif sys.argv[1] == "test":
+       date =  datetime.datetime(2021, 1, 1)
+       print(is_holiday(date))
+
     
     else: print("Use python ./main <create|sim|plot|analyse|populate>")
 
