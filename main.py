@@ -81,6 +81,12 @@ def analyse():
     an = Analytics(game)
     an.analyse_players() 
 
+def plot():
+    game = GameManagement()
+    connection = create_connection(DB_PATH)
+    game.load(connection)
+    return game
+
 if __name__ == '__main__':
 
     #connection = create_connection(".\Databases\games.db")
