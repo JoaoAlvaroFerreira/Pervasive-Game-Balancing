@@ -5,9 +5,13 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import pandas as pd
 
+  
 
-def analysisTest():
-            analyse()
+def simTest():
+            sim()
+
+def createTest():
+            create()
 
 def plotTest():
        a = plot()
@@ -70,12 +74,30 @@ class StartPage(tk.Frame):
 
 
         tk.Button(self,
-            text="Analyse",
+            text="Create",
             width=25,
             height=5,
             bg="white",
             fg="black",
-            command=analysisTest
+            command=createTest
+        ).pack()
+
+        tk.Button(self,
+            text="Simulate",
+            width=25,
+            height=5,
+            bg="white",
+            fg="black",
+            command=simTest
+        ).pack()
+
+        tk.Button(self,
+            text="Analysis",
+            width=25,
+            height=5,
+            bg="white",
+            fg="black",
+            command=lambda: master.switch_frame(AnalysisPage)
         ).pack()
 
 
@@ -90,6 +112,8 @@ class StartPage(tk.Frame):
 app = DataPlatform()
 
 class PageOne(tk.Frame):
+
+    
 
     def __init__(self, master):
         tk.Frame.__init__(self, master)
@@ -115,6 +139,29 @@ class PageOne(tk.Frame):
         ax3.legend(['Stock_Index_Price']) 
         ax3.set_xlabel('Interest Rate')
         ax3.set_title('Interest Rate Vs. Stock Index Price')
+
+
+        
+        OPTIONS = [
+        "Jan",
+        "Feb",
+        "Mar"
+        ] #etc
+
+        
+        variable = tk.StringVar(self)
+        variable.set(OPTIONS[0]) # default value
+
+        w = tk.OptionMenu(self, variable, *OPTIONS)
+        w.pack()
+
+        
+        def ok():
+            print ("value is:" + variable.get())
+
+        button = tk.Button(self, text="OK", command=ok)
+        button.pack()
+
 
 class PageTwo(tk.Frame):
     def __init__(self, master):
@@ -157,8 +204,47 @@ class PageThree(tk.Frame):
        
 
 
+class AnalysisPage(tk.Frame):
+
+    def analysisTest(self):
+        analysisText = analyse()
+        self.T.insert(tk.END, analysisText)
 
 
+    def __init__(self, master):
+        tk.Frame.__init__(self, master)
+        tk.Label(self, text="This is the analysis page").pack(side="top", fill="x", pady=10)
+        tk.Button(self, text="Return to start page",
+                  command=lambda: master.switch_frame(StartPage)).pack()
+        
+        tk.Button(self,
+            text="Analysis",
+            width=25,
+            height=5,
+            bg="white",
+            fg="black",
+            command= self.analysisTest
+        ).pack()
+
+        self.T = tk.Text(self, height = 40, width = 70)
+        self.T.pack()
+        # ensure a consistent GUI size
+        self.grid_propagate(False)
+        # implement stretchability
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+
+        scrollb = tk.Scrollbar(self, command=self.T.yview)
+        scrollb.grid(row=0, column=1, sticky='nsew')
+        self.T['yscrollcommand'] = scrollb.set
+
+        tk.Button(self, text="Filter Analysis",
+                  command=lambda: master.switch_frame(PageOne)).pack()
+        
+
+
+        
 
 
 

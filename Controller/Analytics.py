@@ -16,7 +16,7 @@ class Analytics:
         self.game = game
     
     def analyse_players(self):
-        
+        string_reply = ""
         #plotplot(self.game.players)
         
         for player in self.game.players:
@@ -29,8 +29,10 @@ class Analytics:
             if(len(b)>0):
                 string = "Player {} engaged with {} challenges and has {} recorded play moments, in a total of {} play sessions. He has walked a total of {} Km".format(player.name,len(a),len(b),b[-1].session ,distance)
 
-                print(string )
+                string_reply = string_reply + "\n" + string
         #print(len(self.game.gameplay_moments))
+
+        return string_reply
         
     def get_player_moments(self, player):
         moment_list = []

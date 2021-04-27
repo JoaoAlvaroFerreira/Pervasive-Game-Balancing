@@ -79,7 +79,7 @@ def analyse():
     connection = create_connection(DB_PATH)
     game.load(connection)
     an = Analytics(game)
-    an.analyse_players() 
+    return an.analyse_players() 
 
 def plot():
     game = GameManagement()
