@@ -20,19 +20,87 @@ class Analytics:
         #plotplot(self.game.players)
         
         for player in self.game.players:
-            a = self.get_player_challenges(player)
-            b = self.get_player_moments(player)
-      
-            
-            distance = self.measure_distances(b)
-            player.distance = distance
-            if(len(b)>0):
-                string = "Player {} engaged with {} challenges and has {} recorded play moments, in a total of {} play sessions. He has walked a total of {} Km".format(player.name,len(a),len(b),b[-1].session ,distance)
+            self.calc_kpi(player)
+   
+            string = "Player {} engaged with {} challenges, has {} recorded play moments, a {} challenge success rate in a total of {} play sessions. ".format(player.name, len(player.KPIs.challenges),len(player.KPIs.moments),player.KPIs.challenge_success_rate, player.KPIs.sessions)
 
-                string_reply = string_reply + "\n" + string
+            string_reply = string_reply + "\n" + string
         #print(len(self.game.gameplay_moments))
 
         return string_reply
+
+    def calc_kpi(self,player):
+        player.KPIs = lambda: None
+        player.KPIs.challenges =  self.get_player_challenges(player)
+        player.KPIs.moments = self.get_player_moments(player)
+        player.KPIs.distance_walked = self.measure_distances(player.KPIs.moments)
+        player.KPIs.challenge_success_rate = self.challenge_success_rate(player)
+        
+
+        #lifetime value
+        player.KPIs.purchases = self.get_player_purchases(player)
+        player.KPIs.lifetime_value = 0
+        for purchase in player.KPIs.purchases:
+            player.KPIs.lifetime_value = player.KPIs.lifetime_value + purchase.GameObject.price
+
+        #last moment and sessions
+        player.KPIs.lastLogIn = 365
+        player.KPIs.sessions = 0
+        if(len(player.KPIs.moments)>0):
+            player.KPIs.sessions = player.KPIs.moments[-1].session
+            date =  datetime.datetime(2021, 12, 31,0,0)
+            player.KPIs.lastLogIn = datetime.datetime.strptime(player.KPIs.moments[-1].time, '%Y-%m-%d %H:%M:%S') - date
+        
+        player.KPIs.value_per_session = 0
+
+        #conversion rate (install to purchase)
+        player.KPIs.conversion_rate = 0
+        if(len(player.KPIs.purchases) > 0):
+            player.KPIs.conversion_rate = 1
+
+        #hours-played~
+        player.KPIs.playtime = self.measure_playtime(player.KPIs.moments)
+
+     
+        
+       
+    
+    def challenge_success_rate(self, player):
+        challenge_list = []
+        failure = 0
+        
+        for chi in self.game.challenge_instances:
+            if(chi.player.id == player.id):
+                challenge_list.append(chi)
+
+        if(len(challenge_list)>0):
+            
+
+            for ch in challenge_list:
+                if not ch.success:
+                    failure = failure +1
+                
+            return (len(challenge_list)-failure)/len(challenge_list)
+        else: 
+            return 0
+
+        
+
+    def get_player_purchases(self, player):
+        purchase_list = []
+        for purchase in self.game.purchases:
+            if purchase.Player.id == player.id:
+                purchase_list.append(purchase)
+        
+        return purchase_list
+    
+    def get_player_items(self, player):
+        item_list = []
+        for item in self.game.inventories:
+            if item.Player.id == player.id:
+                item_list.append(moment)
+        
+        return item_list
         
     def get_player_moments(self, player):
         moment_list = []
@@ -50,6 +118,16 @@ class Analytics:
                 challenge_instances.append(chi)
         
         return challenge_instances
+
+    def measure_playtime(self,moment_list):
+        
+        playtime = 0
+        for x in range(len(moment_list)-1):
+            
+            if(moment_list[x].session == moment_list[x+1].session):
+                playtime = playtime + datetime.datetime.strptime(moment_list[x].time, '%Y-%m-%d %H:%M:%S').timestamp()
+
+        return playtime
 
     def measure_distances(self, moment_list):
         value_distance = 0
