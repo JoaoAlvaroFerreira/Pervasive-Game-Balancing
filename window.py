@@ -6,6 +6,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import pandas as pd
 
   
+def plotMapTest():
+        plotmap()
 
 def simTest():
             sim()
@@ -226,7 +228,16 @@ class AnalysisPage(tk.Frame):
             command= self.analysisTest
         ).pack()
 
-        self.T = tk.Text(self, height = 40, width = 70)
+        tk.Button(self,
+            text="Plot",
+            width=25,
+            height=5,
+            bg="white",
+            fg="black",
+            command= plotMapTest
+        ).pack()
+
+        self.T = tk.Text(self, height = 40, width = 300)
         self.T.pack()
         # ensure a consistent GUI size
         self.grid_propagate(False)

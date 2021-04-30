@@ -29,8 +29,11 @@ class Simulation:
         player.session = 0
         date =  datetime.datetime(2021, 1, 1,0,0)
         i = 0
-        for _ in range(1, 14):
+        for _ in range(1, 21):
             
+            if(player.base_motivation > 10):
+                player.base_motivation = 10
+
             date = date + datetime.timedelta(days = 1)
             load_file = 'D:\\School\\5oAno\\TESE\Repo\\Pervasive-Game-Balancing\\Resources\\weather.csv'
             df = pd.read_csv(load_file)
@@ -45,7 +48,7 @@ class Simulation:
 
            
 
-            played_today = True
+            played_today = False
             playval = player.base_motivation + player.Personality.Competitiveness + player.Personality.Immersion
                 #Rain, Cloudy, Sunny, Storm, Very Sunny
             if weather == "Sunny":
@@ -76,7 +79,7 @@ class Simulation:
 
                 if played_today:
                    
-                    if self.decision(player.base_motivation/100):
+                    if self.decision(player.base_motivation/1000):
                         
                         played_today = False
                     
@@ -161,6 +164,7 @@ class Simulation:
         local_motivation = player.base_motivation
 
         while(local_motivation > 0):
+            print("LOCAL MOTIVATION: {}".format(local_motivation))
             rand_mod_a = random.uniform(-0.03,0.02)
             rand_mod_b  = random.uniform(-0.03,0.02)
             curr_lat = curr_lat + rand_mod_a
@@ -174,6 +178,7 @@ class Simulation:
 
             if len(doable_challenges) > 0:
                 player.base_motivation = player.base_motivation + self.do_challenges(doable_challenges, player, datetime)
+                local_motivation = local_motivation + 1
             
             local_motivation = local_motivation - 3
             
@@ -217,6 +222,7 @@ class Simulation:
                 inv.insert_into_db(self.game.conn)
                 self.game.inventories.append(inv)
             else:
+                print("FAIL CHALLENGE")
                 chi = ChallengeInstance(ch, True, False , player,datetime)
 
             chi.insert_into_db(self.game.conn)
@@ -230,7 +236,9 @@ class Simulation:
             return True
 
         else:
-            return self.game.find_object_in_inventory(player, ch.itemSpend)
+            return self.game.spend_item(player, ch.itemSpend)
+
+
         
 
     def verify_done(self, ch, player):

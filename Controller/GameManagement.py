@@ -15,7 +15,7 @@ class GameManagement:
         self.load(conn)
         self.generatePlayers()
         self.generateGameObjects()
-        self.generateChallenges(41.0203, 41.2551, -8.7286, -8.3496)
+        self.generateChallenges(41.1042, 41.2788,-8.6627, -8.4361)
         self.gameplay_moments = []
         
 
@@ -155,6 +155,23 @@ class GameManagement:
                 return True
             
         return False
+    
+    def spend_item(self, player, obj):
+
+        gameObj = "a"
+        
+        for inv in self.inventories:
+            if inv.GameObject.name == obj.name:
+                gameObj = inv
+
+        if(gameObj != "a"):
+            self.inventories.remove(gameObj)
+            del gameObj
+            return True
+
+            
+        return False
+    
 
     def find_challenge(self, id):
         for challenge in self.challenges:
@@ -228,6 +245,7 @@ class GameManagement:
         df_acc = df_acc[(df_acc['longitude'] > minlon) & (df_acc['longitude'] < maxlon)]
         # Add marker for Boulder, CO
         for index, row in df_acc.iterrows():
+   
             a = Challenge(self.challengeTypes[1], "Catch Pokemon", 0, 0, 0.01,0.1, row['latitude'], row['longitude'], self.gameObjects[0], self.gameObjects[8], False)
             self.challenges.append(a)
         
@@ -238,6 +256,7 @@ class GameManagement:
         
         for node in nodes:
             a = Challenge(self.challengeTypes[0], "PokeStop Metro", 0,0, 0.01,0.1, node.lat, node.lon, self.gameObjects[8],None, False)
+            print("Spawn PokeStop Metro")
             self.challenges.append(a)
         
         
@@ -245,6 +264,7 @@ class GameManagement:
         
         for node in nodes:
             a = Challenge(self.challengeTypes[0], "PokeStop Landmark", 0,0, 0.01,0.1, node.lat, node.lon, self.gameObjects[9], None, False)
+            print("Spawn PokeStop Landmark ")
             self.challenges.append(a)
 
     

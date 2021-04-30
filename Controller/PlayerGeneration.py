@@ -96,13 +96,14 @@ def generatePersonality(demo):
 def generatePlayer():
 
     #minLat, maxLat, minLon, maxLon
+    #41.1042, 41.2788,-8.6627, -8.4361
     #Porto 41.0203, 41.2551, -8.7286, -8.3496
     player_batch = []
      ##iberian peninsula
-    latitude = random.uniform(41.0203, 41.2551)
+    latitude = random.uniform(41.1042, 41.2788)
     print("Latitude:")
     print(latitude)
-    longitude = random.uniform(-8.7286, -8.3496)
+    longitude = random.uniform(-8.6627, -8.4361)
     print("Longitude:")
     print(longitude)
     querystring = """https://nominatim.openstreetmap.org/reverse?format=json&lat={}&lon={}&zoom=18&addressdetails=14&accept-language=en

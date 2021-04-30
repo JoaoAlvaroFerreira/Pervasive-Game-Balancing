@@ -18,16 +18,32 @@ class Analytics:
     def analyse_players(self):
         string_reply = ""
         #plotplot(self.game.players)
+        self.calc_average_KPIs()
+
+        averages = " Average Challenges Engaged With = {} \n Average Gameplay Moments = {} \n Average Distance Walked = {} \n Average Challenge Success Rate = {} \n Average Inventory Size = {} \n Average Purchases Made = {} \n Average Lifetime Value = {} \n Average Last Log In = {} \n Average Sessions Per Player = {} \n Average Conversion Rate (Install to Purchase) = {} \n".format( 
+        self.KPIs.challenges 
+        ,self.KPIs.moments 
+        ,self.KPIs.distance_walked
+        ,self.KPIs.challenge_success_rate 
+        ,self.KPIs.inventory 
+        ,self.KPIs.purchases
+        ,self.KPIs.lifetime_value 
+        ,self.KPIs.lastLogIn 
+        ,self.KPIs.sessions 
+        ,self.KPIs.conversion_rate)
+
         
+
         for player in self.game.players:
-            self.calc_kpi(player)
+            
    
             string = "Player {} engaged with {} challenges, has {} recorded play moments, a {} challenge success rate in a total of {} play sessions. ".format(player.name, len(player.KPIs.challenges),len(player.KPIs.moments),player.KPIs.challenge_success_rate, player.KPIs.sessions)
+            string2 = "They have purchased {} items, having spent a total of {}€ and having an inventory with {} items. They last logged in {} ago.".format(player.name, len(player.KPIs.purchases), player.KPIs.lifetime_value, len(player.KPIs.inventory), player.KPIs.lastLogIn)
 
-            string_reply = string_reply + "\n" + string
+            string_reply = string_reply + "\n" + string + string2
         #print(len(self.game.gameplay_moments))
 
-        return string_reply
+        return averages + string_reply
 
     def calc_kpi(self,player):
         player.KPIs = lambda: None
@@ -35,6 +51,7 @@ class Analytics:
         player.KPIs.moments = self.get_player_moments(player)
         player.KPIs.distance_walked = self.measure_distances(player.KPIs.moments)
         player.KPIs.challenge_success_rate = self.challenge_success_rate(player)
+        player.KPIs.inventory = self.get_player_items(player)
         
 
         #lifetime value
@@ -48,10 +65,10 @@ class Analytics:
         player.KPIs.sessions = 0
         if(len(player.KPIs.moments)>0):
             player.KPIs.sessions = player.KPIs.moments[-1].session
-            date =  datetime.datetime(2021, 12, 31,0,0)
-            player.KPIs.lastLogIn = datetime.datetime.strptime(player.KPIs.moments[-1].time, '%Y-%m-%d %H:%M:%S') - date
+            date =  datetime.datetime(2021, 1, 21,0,0)
+            player.KPIs.lastLogIn = (date - datetime.datetime.strptime(player.KPIs.moments[-1].time, '%Y-%m-%d %H:%M:%S')).total_seconds()/3600
         
-        player.KPIs.value_per_session = 0
+        
 
         #conversion rate (install to purchase)
         player.KPIs.conversion_rate = 0
@@ -61,7 +78,44 @@ class Analytics:
         #hours-played~
         player.KPIs.playtime = self.measure_playtime(player.KPIs.moments)
 
-     
+    def calc_average_KPIs(self):
+        self.KPIs = lambda: None
+        self.KPIs.challenges =  len(self.game.challenge_instances)/len(self.game.players)
+        self.KPIs.moments = len(self.game.gameplay_moments)/len(self.game.players)
+        self.KPIs.distance_walked = 0
+        self.KPIs.challenge_success_rate = 0
+        self.KPIs.inventory = len(self.game.inventories)/len(self.game.players)
+        self.KPIs.purchases = len(self.game.purchases)/len(self.game.players)
+        self.KPIs.lifetime_value = 0
+        self.KPIs.lastLogIn = 0
+        self.KPIs.sessions = 0
+        self.KPIs.conversion_rate = 0
+
+        for player in self.game.players:
+            self.calc_kpi(player)
+
+       
+        
+            self.KPIs.distance_walked = self.KPIs.distance_walked + player.KPIs.distance_walked
+            self.KPIs.challenge_success_rate =  self.KPIs.challenge_success_rate + player.KPIs.challenge_success_rate
+            self.KPIs.lifetime_value =  self.KPIs.lifetime_value + player.KPIs.lifetime_value
+            self.KPIs.lastLogIn =  self.KPIs.lastLogIn + player.KPIs.lastLogIn
+            self.KPIs.sessions =  self.KPIs.sessions + player.KPIs.sessions
+            self.KPIs.conversion_rate =  self.KPIs.conversion_rate + player.KPIs.conversion_rate
+        
+        self.KPIs.distance_walked = self.KPIs.distance_walked/len(self.game.players)
+        self.KPIs.challenge_success_rate = self.KPIs.challenge_success_rate/len(self.game.players)
+        self.KPIs.lifetime_value = self.KPIs.lifetime_value/len(self.game.players)
+        self.KPIs.lastLogIn = self.KPIs.lastLogIn/len(self.game.players)
+        self.KPIs.sessions = self.KPIs.sessions/len(self.game.players)
+        self.KPIs.conversion_rate = self.KPIs.conversion_rate/len(self.game.players)
+
+
+
+        
+
+
+
         
        
     
@@ -98,7 +152,7 @@ class Analytics:
         item_list = []
         for item in self.game.inventories:
             if item.Player.id == player.id:
-                item_list.append(moment)
+                item_list.append(item)
         
         return item_list
         

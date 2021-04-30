@@ -87,6 +87,12 @@ def plot():
     game.load(connection)
     return game
 
+def plotmap():
+    game = GameManagement()
+    connection = create_connection(DB_PATH)
+    game.load(connection)
+    combined_plot(game.challenge_instances,game.gameplay_moments)    
+
 if __name__ == '__main__':
 
     #connection = create_connection(".\Databases\games.db")
@@ -109,7 +115,7 @@ if __name__ == '__main__':
         game = GameManagement()
         connection = create_connection(DB_PATH)
         game.load(connection)
-        heatmap_moments(game.challenges)    
+        heatmap_moments(game.moments)    
         #plotplot()   
 
     elif sys.argv[1] == "analyse":

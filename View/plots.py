@@ -20,23 +20,10 @@ data = et.data.get_data('colorado-flood')
 # Set working directory to earth-analytics
 os.chdir(os.path.join(et.io.HOME, 'earth-analytics'))
 
-def plotplot(players):
-    LDN_COORDINATES = (40.2, -4)
-    myMap = folium.Map(location=LDN_COORDINATES, zoom_start=5)
-
-  
-    # Add marker for Boulder, CO
-    for player in players:
-        folium.Marker(
-            location=[player.PlayerLocationInfo.latitude, player.PlayerLocationInfo.longitude], # coordinates for the marker (Earth Lab at CU Boulder)
-            popup='Gameplay Moment', # pop-up label for the marker
-            icon=folium.Icon()
-        ).add_to(myMap)
 
 
-    myMap.save("map.html")
-    webbrowser.open("map.html")
 
+###disregard this one
 def heatmap_plot(players):
 
     LDN_COORDINATES = (40.2, -4)
@@ -70,23 +57,7 @@ def heatmap_plot(players):
     myMap.save("map.html")
     webbrowser.open("map.html")
 
-def plot_challenges(challenges):
- 
-    LDN_COORDINATES = (40.2, -4)
-    myMap = folium.Map(location=LDN_COORDINATES, zoom_start=5)
 
-  
-    # Add marker for Boulder, CO
-    for challenge in challenges:
-        folium.Marker(
-            location=[challenge.latitude, challenge.longitude], # coordinates for the marker (Earth Lab at CU Boulder)
-            popup='Challenge', # pop-up label for the marker
-            icon=folium.Icon()
-        ).add_to(myMap)
-
-
-    myMap.save("challenge_map.html")
-    webbrowser.open("challenge_map.html")
 
 
          
@@ -112,6 +83,7 @@ def plot_players(players):
     plt.show()
 
 def heatmap_moments(moments):
+    print("hello")
     print(len(moments))
 
     LDN_COORDINATES = (40.2, -4)
@@ -162,3 +134,91 @@ def plot_moments(moments):
 
     myMap.save("map.html")
     webbrowser.open("map.html")
+
+
+def plotplot(players):
+    LDN_COORDINATES = (40.2, -4)
+    myMap = folium.Map(location=LDN_COORDINATES, zoom_start=5)
+
+  
+    # Add marker for Boulder, CO
+    for player in players:
+        folium.Marker(
+            location=[player.PlayerLocationInfo.latitude, player.PlayerLocationInfo.longitude], # coordinates for the marker (Earth Lab at CU Boulder)
+            popup='Gameplay Moment', # pop-up label for the marker
+            icon=folium.Icon()
+        ).add_to(myMap)
+
+
+    myMap.save("map.html")
+    webbrowser.open("map.html")
+
+
+def plot_challenges(challenges):
+
+ 
+    LDN_COORDINATES = (40.2, -4)
+    myMap = folium.Map(location=LDN_COORDINATES, zoom_start=5)
+
+  
+    # Add marker for Boulder, CO
+    for challenge in challenges:
+        folium.Marker(
+            location=[challenge.latitude, challenge.longitude], # coordinates for the marker (Earth Lab at CU Boulder)
+            popup='Challenge', # pop-up label for the marker
+            icon=folium.Icon()
+        ).add_to(myMap)
+
+
+    myMap.save("challenge_map.html")
+    webbrowser.open("challenge_map.html")
+
+def combined_plot(challenges, moments):
+
+    
+    LDN_COORDINATES = (41.15,-8.6)
+    myMap = folium.Map(location=LDN_COORDINATES, zoom_start=10)
+
+    d = {'latitude': [], 'longitude': []}
+    df_acc = pd.DataFrame(data=d)
+    
+   
+    # Add marker for Boulder, CO
+    for moment in moments:
+        
+        df2 = pd.DataFrame({'latitude': [moment.latitude], 'longitude': [moment.longitude]})
+        df_acc = df_acc.append(df2)
+        
+    df_acc['latitude'] = df_acc['latitude'].astype(float)
+    df_acc['longitude'] = df_acc['longitude'].astype(float)
+
+
+    heat_df = df_acc[['latitude', 'longitude']]
+    heat_df = heat_df.dropna(axis=0, subset=['latitude','longitude'])
+
+    print(heat_df, "\n")
+
+    # List comprehension to make out list of lists
+    heat_data = [[row['latitude'],row['longitude']] for index, row in heat_df.iterrows()]
+
+    # Plot it on the map
+    HeatMap(heat_data).add_to(myMap)
+
+    for challenge in challenges:
+
+        if(challenge.success):
+            folium.Marker(
+                location=[challenge.Challenge.latitude, challenge.Challenge.longitude], # coordinates for the marker (Earth Lab at CU Boulder)
+                popup='Challenge Completed with Success', # pop-up label for the marker
+                icon=folium.Icon(color="blue", icon="check-circle")
+            ).add_to(myMap)
+        else:
+                folium.Marker(
+                location=[challenge.Challenge.latitude, challenge.Challenge.longitude], # coordinates for the marker (Earth Lab at CU Boulder)
+                popup='Challenge Failure', # pop-up label for the marker
+                icon=folium.Icon(color="gray", icon="times-circle")
+            ).add_to(myMap)
+
+    myMap.save("map.html")
+    webbrowser.open("map.html")
+
