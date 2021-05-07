@@ -97,7 +97,6 @@ def generatePlayer():
 
     #minLat, maxLat, minLon, maxLon
     #41.1042, 41.2788,-8.6627, -8.4361
-    #Porto 41.0203, 41.2551, -8.7286, -8.3496
     player_batch = []
      ##iberian peninsula
     latitude = random.uniform(41.1042, 41.2788)
@@ -114,7 +113,7 @@ def generatePlayer():
 
     
     if 'address' in r and r['address']['country']!= "France" and r['address']['country']!= "Czechia":
-        for _ in range(0,3):
+        for _ in range(0,10):
         
             player = Player(names.get_full_name())
 

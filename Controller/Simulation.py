@@ -32,7 +32,8 @@ class Simulation:
         for _ in range(1, 21):
             
             if(player.base_motivation > 10):
-                player.base_motivation = 10
+                player.base_motivation = 5
+                self.make_purchase(player, date)
 
             date = date + datetime.timedelta(days = 1)
             load_file = 'D:\\School\\5oAno\\TESE\Repo\\Pervasive-Game-Balancing\\Resources\\weather.csv'
@@ -202,6 +203,36 @@ class Simulation:
             
 
         return doable_challenges
+
+    def make_purchase(self, player, datetime):
+        if player.Demographic.SocioEconomicStatus > .5 and player.Demographic.SocioEconomicStatus < .7:
+            purchasing_power = 1
+        
+        elif player.Demographic.SocioEconomicStatus > .7 and player.Demographic.SocioEconomicStatus < .9:
+            purchasing_power = 2
+        
+        elif player.Demographic.SocioEconomicStatus > .9 and player.Demographic.SocioEconomicStatus < 1.1:
+            purchasing_power = 3
+        
+        elif player.Demographic.SocioEconomicStatus > 1.1 and player.Demographic.SocioEconomicStatus < 1.3:
+            purchasing_power = 4
+        
+        elif player.Demographic.SocioEconomicStatus > 1.3:
+            purchasing_power = 5
+        
+        else:
+            purchasing_power = 0
+        
+        purchase_obj = "a"
+        for item in self.game.gameObjects:
+            if item.price == purchasing_power:
+                purchase_obj = item
+
+        
+        if purchase_obj != "a":
+            purchase = Purchase(player, purchase_obj, datetime)
+            self.game.purchases.append(purchase)
+            purchase.insert_into_db(self.game.conn)
 
     def do_challenges(self, doable_challenges, player, datetime):
               

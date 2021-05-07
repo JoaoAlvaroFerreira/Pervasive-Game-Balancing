@@ -38,6 +38,8 @@ def plotTest():
          'Challenges Completed': [len(kid), len(young), len(adult), len(elderly)]
         }
 
+def MLtest():
+    ML()
 
 class DataPlatform(tk.Tk):
 
@@ -252,6 +254,15 @@ class AnalysisPage(tk.Frame):
 
         tk.Button(self, text="Filter Analysis",
                   command=lambda: master.switch_frame(PageOne)).pack()
+        
+        tk.Button(self,
+            text="Random Forest",
+            width=25,
+            height=5,
+            bg="white",
+            fg="black",
+            command= MLtest
+        ).pack()
         
 
 

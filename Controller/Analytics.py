@@ -206,3 +206,24 @@ class Analytics:
         plot_challenges(self.game.challenges)
 
 
+    def data_preprocessing(self):
+        data = []
+        gender = 0
+        age = 0
+        for player in self.game.players:
+            if player.Demographic.Gender == "Male":
+                gender = 1
+            
+            if player.Demographic.Age == "Youth":
+                age = 1
+            elif player.Demographic.Age == "Adult":
+                age = 2
+            elif player.Demographic.Age == "Elderly":
+                age = 3
+
+
+            row = [age, gender, player.Demographic.SocioEconomicStatus, player.PlayerLocationInfo.latitude, player.PlayerLocationInfo.longitude, len(player.KPIs.challenges), player.KPIs.lifetime_value, player.KPIs.sessions]
+            data.append(row)
+
+
+        return pd.DataFrame.from_records(data, columns=['Age', 'Gender', "Economic Status", "Latitude", "Longitude", "Challenges Done", "Lifetime Value", "Sessions"])
