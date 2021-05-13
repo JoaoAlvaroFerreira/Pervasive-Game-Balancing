@@ -48,3 +48,13 @@ def random_forest(dataset):
     print('Mean Absolute Error:', metrics.mean_absolute_error(y_test, y_pred))
     print('Mean Squared Error:', metrics.mean_squared_error(y_test, y_pred))
     print('Root Mean Squared Error:', np.sqrt(metrics.mean_squared_error(y_test, y_pred)))
+
+def filter_data(dataset, variable, value, max):
+    
+    
+    if max:
+        dataset = dataset[df_acc[variable]>value] # Reducing data size so it runs faster
+    else:
+        dataset = dataset[df_acc[variable]<value] # Reducing data size so it runs faster
+
+    return dataset

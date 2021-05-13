@@ -254,6 +254,10 @@ class AnalysisPage(tk.Frame):
 
         tk.Button(self, text="Filter Analysis",
                   command=lambda: master.switch_frame(PageOne)).pack()
+
+        
+        tk.Button(self, text="MLGogo",
+                  command=lambda: master.switch_frame(MLPage)).pack()
         
         tk.Button(self,
             text="Random Forest",
@@ -264,6 +268,20 @@ class AnalysisPage(tk.Frame):
             command= MLtest
         ).pack()
         
+
+class MLPage(tk.Frame):
+     def __init__(self, master):
+        tk.Frame.__init__(self, master)
+        tk.Label(self, text="Test display").pack(side="top", fill="x", pady=10)
+        tk.Button(self, text="Return to start page",
+                  command=lambda: master.switch_frame(StartPage)).pack()
+
+        
+        variable = tk.StringVar(self)
+        variable.set("one") # default value
+
+        w = tk.OptionMenu(self, variable, "one", "two", "three")
+        w.pack()
 
 
         
