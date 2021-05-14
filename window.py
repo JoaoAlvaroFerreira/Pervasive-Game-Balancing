@@ -38,8 +38,6 @@ def plotTest():
          'Challenges Completed': [len(kid), len(young), len(adult), len(elderly)]
         }
 
-def MLtest():
-    ML()
 
 class DataPlatform(tk.Tk):
 
@@ -259,29 +257,73 @@ class AnalysisPage(tk.Frame):
         tk.Button(self, text="MLGogo",
                   command=lambda: master.switch_frame(MLPage)).pack()
         
-        tk.Button(self,
-            text="Random Forest",
-            width=25,
-            height=5,
-            bg="white",
-            fg="black",
-            command= MLtest
-        ).pack()
         
 
 class MLPage(tk.Frame):
-     def __init__(self, master):
+
+    
+
+
+    def __init__(self, master):
         tk.Frame.__init__(self, master)
         tk.Label(self, text="Test display").pack(side="top", fill="x", pady=10)
         tk.Button(self, text="Return to start page",
                   command=lambda: master.switch_frame(StartPage)).pack()
 
         
-        variable = tk.StringVar(self)
-        variable.set("one") # default value
+        
+        OPTIONS = [
+        "Challenges Done", "Lifetime Value", "Sessions"
+        ] #etc
 
-        w = tk.OptionMenu(self, variable, "one", "two", "three")
+        OPTIONS2 = [
+        "Max",
+        "Min"
+        ] #etc
+
+        canvas1 = tk.Canvas(self, width = 400, height = 300)
+        canvas1.pack()
+        self.variableString = tk.StringVar(self)
+        self.variableString.set(OPTIONS[0]) # default value
+
+        w = tk.OptionMenu(self, self.variableString, *OPTIONS)
         w.pack()
+
+        self.variableMinMax = tk.StringVar(self)
+        self.variableMinMax.set(OPTIONS2[0]) # default value
+
+        z = tk.OptionMenu(self, self.variableMinMax, *OPTIONS2)
+        z.pack()
+
+        self.entry1 = tk.Entry(self) 
+        self.entry1.insert(tk.END, 0)
+        canvas1.create_window(200, 140, window=self.entry1)
+
+        
+        self.T = tk.Text(self, height = 40, width = 200)
+        self.T.pack()
+       
+       
+
+
+
+
+
+        tk.Button(self,
+            text="Go ML Go",
+            width=25,
+            height=5,
+            bg="white",
+            fg="black",
+            command=self.MLtest
+        ).pack()
+
+    def MLtest(self):
+            variableStringT = self.variableString.get()
+            variableMinMaxT = self.variableMinMax.get()
+            a = ML(variableStringT,self.entry1.get(), variableMinMaxT)
+            self.T.insert(tk.END, a)
+       
 
 
         

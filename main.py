@@ -84,14 +84,15 @@ def analyse():
     an = Analytics(game)
     return an.analyse_players() 
 
-def ML():
+def ML(variable, value, max):
     game = GameManagement()
     connection = create_connection(DB_PATH)
     game.load(connection)
     an = Analytics(game)
     an.calc_average_KPIs()
     dataset = an.data_preprocessing()
-    random_forest(dataset)
+    return filter_data(dataset, variable, value, max)
+    #random_forest(dataset)
 
 
 def plot():

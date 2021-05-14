@@ -51,10 +51,11 @@ def random_forest(dataset):
 
 def filter_data(dataset, variable, value, max):
     
+    print("Variable:{} Value: {} Max:{}".format(variable,value,max))
     
-    if max:
-        dataset = dataset[df_acc[variable]>value] # Reducing data size so it runs faster
+    if max == "Max":
+        dataset = dataset[dataset[variable]>int(value)] # Reducing data size so it runs faster
     else:
-        dataset = dataset[df_acc[variable]<value] # Reducing data size so it runs faster
+        dataset = dataset[dataset[variable]<int(value)] # Reducing data size so it runs faster
 
     return dataset
