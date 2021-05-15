@@ -91,8 +91,8 @@ def ML(variable, value, max):
     an = Analytics(game)
     an.calc_average_KPIs()
     dataset = an.data_preprocessing()
-    return filter_data(dataset, variable, value, max)
-    #random_forest(dataset)
+    filtered = filter_data(dataset, variable, value, max)
+    return random_forest(filtered)
 
 
 def plot():
