@@ -92,7 +92,7 @@ def ML(variable, value, max):
     an.calc_average_KPIs()
     dataset = an.data_preprocessing()
     filtered = filter_data(dataset, variable, value, max)
-    return random_forest(filtered)
+    return random_forest(filtered, max)
 
 
 def plot():
