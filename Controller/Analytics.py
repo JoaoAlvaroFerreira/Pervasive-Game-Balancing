@@ -9,6 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import math
 from View.plots import *
+from Controller.Quadrant import Quadrant
 
 
 class Analytics:
@@ -211,8 +212,10 @@ class Analytics:
         gender = 0
         age = 0
         for player in self.game.players:
-            if player.Demographic.Gender == "Male":
+            if player.Demographic.Gender == 'Male':
                 gender = 1
+            elif player.Demographic.Gender == 'Female':
+                gender = 0
             
             if player.Demographic.Age == "Youth":
                 age = 1
@@ -222,8 +225,199 @@ class Analytics:
                 age = 3
 
 
-            row = [age, gender, player.Demographic.SocioEconomicStatus, player.PlayerLocationInfo.latitude, player.PlayerLocationInfo.longitude, len(player.KPIs.challenges), player.KPIs.lifetime_value, player.KPIs.sessions]
+            row = [player.Demographic.Age, gender, player.Demographic.SocioEconomicStatus, player.PlayerLocationInfo.latitude, player.PlayerLocationInfo.longitude, len(player.KPIs.challenges), player.KPIs.lifetime_value, player.KPIs.sessions]
             data.append(row)
 
 
         return pd.DataFrame.from_records(data, columns=['Age', 'Gender', "Economic Status", "Latitude", "Longitude", "Challenges Done", "Lifetime Value", "Sessions"])
+    
+    def early_triggers(self, dataset):
+        returnable = ""
+
+        kd = dataset[dataset["Age"] == 'Kid']
+        kid_dataset = kd.copy()
+        avg_lv = dataset['Economic Status'].mean()
+        kid_count = 0
+        print(kid_dataset)
+        for kid in kid_dataset.itertuples():
+            print("KID: ")
+            print(kid)
+            if kid._7 > avg_lv:
+                kid_count = kid_count + 1
+
+        kid_ratio = kid_count/len(kid_dataset)
+        
+        if kid_count>1:
+            string = "Warning: {} of children seem to have a lifetime spending over the average. \n".format(kid_ratio)
+            returnable = returnable + string
+
+
+        #load_file = 'D:\\School\\5oAno\\TESE\Repo\\Pervasive-Game-Balancing\\Resources\\weather.csv'
+        #df = pd.read_csv(load_file)
+        #today = df.loc[df['Day'] == date.timetuple().tm_yday]
+        #weather = print(today['Weather'])
+
+        #for ch in self.game.challenge_instances:
+        #    ch.timestamp.timetuple().tm_yday
+
+        return returnable
+    
+    def demo_analysis(self, demos):
+        stringTrigger = ""
+        ageAdult = 0
+        ageElderly = 0
+        ageChild = 0
+        men = 0
+        women = 0
+        total_economicstatus = 0
+        for row in demos:
+            total_economicstatus = total_economicstatus + row[4]
+            if row[3] == 1:
+                men = men + 1
+            else: 
+                women = women + 1
+
+            if (row[0] > row[1]) and (row[0] > row[2]):
+                ageAdult = ageAdult + 1
+            elif (row[1] > row[0]) and (row[1] > row[2]):
+                ageElderly = ageElderly + 1
+            else:
+                ageChild = ageChild + 1
+        
+        avg_economicstatus = total_economicstatus/(men+women)
+        real_tes = 0
+
+        for player in self.game.players:
+            real_tes = real_tes + player.Demographic.SocioEconomicStatus
+        
+        avg_tes = real_tes/len(self.game.players)
+
+        print("AVG_TES", avg_tes)
+        print("AVG_SIM_TES", avg_economicstatus)
+
+        
+        tes_ratio = avg_economicstatus/avg_tes
+        stringTrigger = stringTrigger + "The average economic status among this group is {} higher than the average \n".format(tes_ratio)
+
+                   
+
+        print("Men:", men)
+        print("Women:", women)
+        if men>women:
+            count = 0
+            for player in self.game.players:
+                   if player.Demographic.Gender == 'Male':
+                       count = count+1
+
+            genderRatio = men/(men+women)
+            trueGenderRatio = count/len(self.game.players)
+            genderDelta = abs(genderRatio-trueGenderRatio)
+            stringTrigger = stringTrigger + "Men are over-represented by a rate of {}. TruePercent = {}, Sim Percent = {} \n".format(genderDelta, trueGenderRatio, genderRatio)
+            if genderDelta > 0.2:
+                stringTrigger = stringTrigger + "WARNING WARNING \n"
+
+        elif men < women:
+            count = 0
+            for player in self.game.players:
+                   if player.Demographic.Gender == 'Female':
+                       count = count+1
+
+            genderRatio = women/(men+women)
+            trueGenderRatio = count/len(self.game.players)
+            genderDelta = abs(genderRatio-trueGenderRatio)
+            stringTrigger = stringTrigger + "Women are over-represented by a rate of {}. TruePercent = {}, Sim Percent = {} \n".format(genderDelta, trueGenderRatio, genderRatio)
+            if genderDelta > 0.2:
+                stringTrigger = stringTrigger + "WARNING WARNING \n"
+
+        if (ageAdult > ageElderly) and (ageAdult > ageChild):
+            count = 0
+            for player in self.game.players:
+                   if player.Demographic.Age == 'Adult':
+                       count = count+1
+            
+            truePercent = count/len(self.game.players)
+            simPercent = ageAdult/(ageAdult+ageElderly+ageChild)
+            deltaPercent = abs(simPercent-truePercent)
+            stringTrigger = stringTrigger + "Adults are over-represented by a rate of {}. TruePercent = {}, Sim Percent = {} \n".format(deltaPercent, truePercent, simPercent)
+            if deltaPercent > 0.2:
+                stringTrigger = stringTrigger + "WARNING WARNING \n"
+
+
+
+
+
+        elif (ageElderly > ageAdult) and (ageElderly > ageChild):
+            count = 0
+            for player in self.game.players:
+                   if player.Demographic.Age == 'Elderly':
+                       count = count+1
+            
+            truePercent = count/len(self.game.players)
+            simPercent = ageAdult/(ageAdult+ageElderly+ageChild)
+            deltaPercent = abs(simPercent-truePercent)
+            stringTrigger = "The Elderly are over-represented by a rate of {}. TruePercent = {}, Sim Percent = {} \n".format(deltaPercent, truePercent, simPercent)
+            if deltaPercent > 0.2:
+                stringTrigger = stringTrigger + "WARNING WARNING \n"
+
+        else:
+            count = 0
+            for player in self.game.players:
+                   if player.Demographic.Age == 'Children':
+                       count = count+1
+            
+            truePercent = count/len(self.game.players)
+            simPercent = ageAdult/(ageAdult+ageElderly+ageChild)
+            deltaPercent = abs(simPercent-truePercent)
+            stringTrigger = "Children are over-represented by a rate of {}\n".format(deltaPercent)
+            if deltaPercent > 0.2:
+                stringTrigger = stringTrigger + "WARNING WARNING\n"
+
+        stringTrigger = stringTrigger + self.geoAnalysis(demos)
+
+        return stringTrigger
+
+    def geoAnalysis(self, demos):
+        print(demos)
+        maxLat = 41.2788
+        minLat = 41.1042
+        maxLong = -8.4361
+        minLong = -8.6627
+        stepLat = (maxLat - minLat)/5
+        stepLong = (maxLong - minLong)/5
+        quadrants = []
+
+
+        for x in range(1,6):
+            for y in range(1,6):
+                quadrants.append(Quadrant(
+                    minLat + stepLat*(x-1),
+                    minLat + stepLat*x,
+                    minLong + stepLong*(x-1),
+                    minLong + stepLong*x
+                ))
+
+        print("There are {} quadrants".format(len(quadrants)))
+
+        for row in demos:
+            print("ROW5: {}, ROW6: {}".format(row[6], row[7]))
+            for quadrant in quadrants:
+               
+                if quadrant.add_player(row[6], row[7]):
+                    print("eeeeeee????")
+                    break
+
+        quadrants.sort(key=lambda x: x.population, reverse=True)
+        pop_avg = sum([quadrant.population for quadrant in quadrants]) / len(quadrants)
+
+        stringTrigger = "The average player count per quadrant is {}".format(pop_avg)
+
+        stringTrigger = stringTrigger + "\n The following quadrants have an above average concentration of players: "
+
+        for q in quadrants:
+            if(q.population > pop_avg):
+                ratio = q.population/pop_avg
+                string = "\n The quadrant from [{},{}] to [{},{}] has a population {} above the average.".format(q.minLat,q.minLong,q.maxLat, q.maxLong, ratio)
+                stringTrigger = stringTrigger + string
+
+
+        return stringTrigger

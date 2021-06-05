@@ -15,6 +15,8 @@ class GameManagement:
         self.load(conn)
         self.generatePlayers()
         self.generateGameObjects()
+        #Old  41.1042, 41.2788,-8.6627, -8.4361
+        #New, Challenge Only 41.3139, 41.0700, -8.7187, -8.3881
         self.generateChallenges(41.1042, 41.2788,-8.6627, -8.4361)
         self.gameplay_moments = []
         
@@ -182,7 +184,7 @@ class GameManagement:
     def generatePlayers(self):
         self.players = []
 
-        for _ in range(100):
+        for _ in range(1000):
             self.players.extend(playgen.generatePlayer())
 
         

@@ -20,22 +20,20 @@ def plotTest():
 
        
        kid = []
-       young = []
+       
        adult = []
        elderly = []
 
        for ch in a.gameplay_moments:
            if ch.player.Demographic.Age == "Kid":
                kid.append(ch)
-           elif ch.player.Demographic.Age == "Youth":
-               young.append(ch)
            elif ch.player.Demographic.Age == "Adult":
                adult.append(ch)
            elif ch.player.Demographic.Age == "Elderly":
                elderly.append(ch)
        
-       return {'Age': ['Kid','Young','Adult','Elderly'],
-         'Challenges Completed': [len(kid), len(young), len(adult), len(elderly)]
+       return {'Age': ['Kid','Adult','Elderly'],
+         'Challenges Completed': [len(kid), len(adult), len(elderly)]
         }
 
 
@@ -45,6 +43,7 @@ class DataPlatform(tk.Tk):
         tk.Tk.__init__(self)
         self._frame = None
         self.switch_frame(StartPage)
+        self.winfo_toplevel().title("Pervasive Game Data Platform Analysis")
 
     def switch_frame(self, frame_class):
         """Destroys current frame and replaces it with a new one."""
@@ -66,13 +65,7 @@ class StartPage(tk.Frame):
 
     def __init__(self, master):
         tk.Frame.__init__(self, master)
-        tk.Label(self, text="This is the start page").pack(side="top", fill="x", pady=10)
-        tk.Button(self, text="Open page one",
-                  command=lambda: master.switch_frame(PageOne)).pack()
-        tk.Button(self, text="Open page two",
-                  command=lambda: master.switch_frame(PageTwo)).pack()
-        tk.Button(self, text="Open page three",
-                  command=lambda: master.switch_frame(PageThree)).pack()
+    
 
 
         tk.Button(self,
@@ -102,6 +95,25 @@ class StartPage(tk.Frame):
             command=lambda: master.switch_frame(AnalysisPage)
         ).pack()
 
+        tk.Button(self,
+            text="Interactive Maps",
+            width=25,
+            height=5,
+            bg="white",
+            fg="black",
+            command=plotMapTest
+        ).pack()
+
+
+        tk.Button(self,
+                text="Comprehensive ML Analysis",
+                width=25,
+                height=5,
+                bg="white",
+                fg="black",
+                command=lambda: master.switch_frame(PageOne)
+            ).pack()
+
 
        
 
@@ -122,47 +134,36 @@ class PageOne(tk.Frame):
         tk.Label(self, text="This is page one").pack(side="top", fill="x", pady=10)
         tk.Button(self, text="Return to start page",
                   command=lambda: master.switch_frame(StartPage)).pack()
+        
+        self.T = tk.Text(self, height = 40, width = 300)
+        self.T.pack()
+        # ensure a consistent GUI size
+        self.grid_propagate(False)
+        # implement stretchability
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+
+        scrollb = tk.Scrollbar(self, command=self.T.yview)
+        scrollb.grid(row=0, column=1, sticky='nsew')
+        self.T['yscrollcommand'] = scrollb.set
+
+        
+        tk.Button(self, text="Comprehensive Analysis",
+                  command=self.ML_analysis).pack()
+        
+    def ML_analysis(self):
+            a = full_ML()
+            self.T.insert(tk.END, a)
+
+
+        
 
 
       
         
 
 
-        data3 = {'Interest_Rate': [5,5.5,6,5.5,5.25,6.5,7,8,7.5,8.5],
-                'Stock_Index_Price': [1500,1520,1525,1523,1515,1540,1545,1560,1555,1565]
-                }  
-        df3 = pd.DataFrame(data3,columns=['Interest_Rate','Stock_Index_Price'])
-
-        figure3 = plt.Figure(figsize=(5,4), dpi=100)
-        ax3 = figure3.add_subplot(111)
-        ax3.scatter(df3['Interest_Rate'],df3['Stock_Index_Price'], color = 'g')
-        scatter3 = FigureCanvasTkAgg(figure3, self ) 
-        scatter3.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH)
-        ax3.legend(['Stock_Index_Price']) 
-        ax3.set_xlabel('Interest Rate')
-        ax3.set_title('Interest Rate Vs. Stock Index Price')
-
-
-        
-        OPTIONS = [
-        "Jan",
-        "Feb",
-        "Mar"
-        ] #etc
-
-        
-        variable = tk.StringVar(self)
-        variable.set(OPTIONS[0]) # default value
-
-        w = tk.OptionMenu(self, variable, *OPTIONS)
-        w.pack()
-
-        
-        def ok():
-            print ("value is:" + variable.get())
-
-        button = tk.Button(self, text="OK", command=ok)
-        button.pack()
 
 
 class PageTwo(tk.Frame):
@@ -229,12 +230,12 @@ class AnalysisPage(tk.Frame):
         ).pack()
 
         tk.Button(self,
-            text="Plot",
+            text="Graphs",
             width=25,
             height=5,
             bg="white",
             fg="black",
-            command= plotMapTest
+            command= lambda: master.switch_frame(PageThree)
         ).pack()
 
         self.T = tk.Text(self, height = 40, width = 300)
