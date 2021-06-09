@@ -255,7 +255,7 @@ class AnalysisPage(tk.Frame):
                   command=lambda: master.switch_frame(PageOne)).pack()
 
         
-        tk.Button(self, text="MLGogo",
+        tk.Button(self, text="Machine Learning with Filtering",
                   command=lambda: master.switch_frame(MLPage)).pack()
         
         

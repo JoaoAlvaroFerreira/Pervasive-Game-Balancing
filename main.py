@@ -105,13 +105,13 @@ def full_ML():
     dataset = an.data_preprocessing()
     early_triggers = an.early_triggers(dataset)
     #Challenges Done", "Lifetime Value", "Sessions
-    filtered1 = filter_data(dataset, "Lifetime Value", 50, "Max")
+    filtered1 = filter_data(dataset, "Lifetime Value", 15, "Max")
     filtered2 = filter_data(dataset, "Challenges Done", 30, "Max")
-    filtered3 = filter_data(dataset, "Sessions", 130, "Max")
+    filtered3 = filter_data(dataset, "Sessions", 50, "Max")
 
     filtered4 = filter_data(dataset, "Lifetime Value", 2, "Min")
     filtered5 = filter_data(dataset, "Challenges Done", 2, "Min")
-    filtered6 = filter_data(dataset, "Sessions", 10, "Min")
+    filtered6 = filter_data(dataset, "Sessions", 5, "Min")
     combined_data_max = pd.concat([filtered1, filtered2, filtered3])
     combined_data_min = pd.concat([filtered4, filtered5,filtered6])
     demos_max = random_forest(combined_data_max, "")

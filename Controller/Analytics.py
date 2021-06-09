@@ -12,6 +12,20 @@ from View.plots import *
 from Controller.Quadrant import Quadrant
 
 
+class Challenge_Count:
+    def __init__(self, Challenge):
+        self.Challenge = Challenge
+        self.count = 1
+
+    def plus_one(self):
+        self.count = self.count + 1
+
+    def minus_one(self):
+        self.count == self.count - 1
+    
+
+
+
 class Analytics:
     def __init__(self, game):
         self.game = game
@@ -19,6 +33,7 @@ class Analytics:
     def analyse_players(self):
         string_reply = ""
         #plotplot(self.game.players)
+        chs = self.calc_best_worst_challenges()
         self.calc_average_KPIs()
 
         averages = " Average Challenges Engaged With = {} \n Average Gameplay Moments = {} \n Average Distance Walked = {} \n Average Challenge Success Rate = {} \n Average Inventory Size = {} \n Average Purchases Made = {} \n Average Lifetime Value = {} \n Average Last Log In = {} \n Average Sessions Per Player = {} \n Average Conversion Rate (Install to Purchase) = {} \n".format( 
@@ -44,7 +59,45 @@ class Analytics:
             string_reply = string_reply + "\n" + string + string2
         #print(len(self.game.gameplay_moments))
 
-        return averages + string_reply
+        return  averages + chs + string_reply
+
+    def calc_best_worst_challenges(self):
+        best = []
+        worst = []
+        challenge_counts = []
+        found = False
+        for ch in self.game.challenge_instances:
+            found = False
+            for cc in challenge_counts:
+                if ch.Challenge.id == cc.Challenge.id:
+                    found = True
+                    if ch.success:
+                        cc.plus_one()
+                    else:
+                        cc.minus_one()
+                    
+            if not found:
+                challenge_counts.append(Challenge_Count(ch.Challenge))
+
+                    
+        
+        challenge_counts.sort(key=lambda x: x.count, reverse=True)
+
+        avg_count = sum(ch.count for ch in challenge_counts)/(len(challenge_counts))
+
+       
+        
+        stringgood = "\n The average of challenge completions per challenge is {}. \n \n The three best challenges are: \n {} at {},{} with {} successful completions \n {} at {},{} with {} successful completions. \n {} at {},{} with {} successful completions \n \n".format(avg_count, challenge_counts[0].Challenge.name, challenge_counts[0].Challenge.latitude, challenge_counts[0].Challenge.longitude, challenge_counts[0].count,challenge_counts[1].Challenge.name, challenge_counts[1].Challenge.latitude, challenge_counts[1].Challenge.longitude, challenge_counts[1].count,challenge_counts[2].Challenge.name, challenge_counts[2].Challenge.latitude, challenge_counts[2].Challenge.longitude, challenge_counts[2].count)
+        stringbad = "The three worst challenges are: \n {} at {},{} with {} successful completions \n {} at {},{} with {} successful completions. \n {} at {},{} with {} successful completions.  \n NOTE: All attempts are summed succesful completions count as +1 while failures count as -1. \n \n".format( 
+        challenge_counts[-1].Challenge.name, challenge_counts[-1].Challenge.latitude, challenge_counts[-1].Challenge.longitude, challenge_counts[-1].count,
+        challenge_counts[-2].Challenge.name, challenge_counts[-2].Challenge.latitude, challenge_counts[-2].Challenge.longitude, challenge_counts[-2].count,
+        challenge_counts[-3].Challenge.name, challenge_counts[-3].Challenge.latitude, challenge_counts[-3].Challenge.longitude, challenge_counts[-3].count)
+
+        return stringgood + stringbad
+
+
+
+
 
     def calc_kpi(self,player):
         player.KPIs = lambda: None
@@ -399,11 +452,11 @@ class Analytics:
         print("There are {} quadrants".format(len(quadrants)))
 
         for row in demos:
-            print("ROW5: {}, ROW6: {}".format(row[6], row[7]))
+            
             for quadrant in quadrants:
                
                 if quadrant.add_player(row[6], row[7]):
-                    print("eeeeeee????")
+                    
                     break
 
         quadrants.sort(key=lambda x: x.population, reverse=True)
