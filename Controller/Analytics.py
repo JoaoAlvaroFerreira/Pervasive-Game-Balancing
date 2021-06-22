@@ -36,7 +36,7 @@ class Analytics:
         chs = self.calc_best_worst_challenges()
         self.calc_average_KPIs()
 
-        averages = " Average Challenges Engaged With = {} \n Average Gameplay Moments = {} \n Average Distance Walked = {} \n Average Challenge Success Rate = {} \n Average Inventory Size = {} \n Average Purchases Made = {} \n Average Lifetime Value = {} \n Average Last Log In = {} \n Average Sessions Per Player = {} \n Average Conversion Rate (Install to Purchase) = {} \n".format( 
+        averages = " Average Challenges Engaged With = {} \n Average Gameplay Moments = {} \n Average Distance Walked = {} \n Average Challenge Success Rate = {} \n Average Inventory Size = {} \n Average Purchases Made = {} \n Average Lifetime Value = {} \n Average Last Log In = {} \n Average Sessions Per Player = {} \n Average Conversion Rate (Install to Purchase) = {} \n  Three Day Retention = {} \n".format( 
         self.KPIs.challenges 
         ,self.KPIs.moments 
         ,self.KPIs.distance_walked
@@ -46,20 +46,22 @@ class Analytics:
         ,self.KPIs.lifetime_value 
         ,self.KPIs.lastLogIn 
         ,self.KPIs.sessions 
-        ,self.KPIs.conversion_rate)
+        ,self.KPIs.conversion_rate
+        ,self.KPIs.retention)
 
-        
+        total, male, female, kid, youth, adult, elderly = self.calc_demographic_incomes()
+        income = "The following is the distribution of income by demographic: \n Male: {} {} \n Female: {} {} \n Kid: {} {} \n Youth: {} {} \n Adult: {} {} \n Elderly: {} {} \n Total: {} \n ".format(male, male/total, female, female/total, kid, kid/total, youth, youth/total, adult, adult/total,elderly, elderly/total, total)
 
         for player in self.game.players:
             
    
             string = "Player {} engaged with {} challenges, has {} recorded play moments, a {} challenge success rate in a total of {} play sessions. ".format(player.name, len(player.KPIs.challenges),len(player.KPIs.moments),player.KPIs.challenge_success_rate, player.KPIs.sessions)
-            string2 = "They have purchased {} items, having spent a total of {}€ and having an inventory with {} items. They last logged in {} ago.".format(player.name, len(player.KPIs.purchases), player.KPIs.lifetime_value, len(player.KPIs.inventory), player.KPIs.lastLogIn)
-
+            string2 = "They have purchased {} items, having spent a total of {}€ and having an inventory with {} items. They last logged in {} ago.".format(len(player.KPIs.purchases), player.KPIs.lifetime_value, len(player.KPIs.inventory), player.KPIs.lastLogIn)
+            
             string_reply = string_reply + "\n" + string + string2
         #print(len(self.game.gameplay_moments))
-
-        return  averages + chs + string_reply
+        string3 = "\n \n  NOTE: If the user's last log in is '000', that means they have never logged in. A user who logged in in the last day of the simulation will have '0.0' instead" 
+        return  averages + income + string_reply + string3
 
     def calc_best_worst_challenges(self):
         best = []
@@ -96,6 +98,36 @@ class Analytics:
         return stringgood + stringbad
 
 
+    def calc_demographic_incomes(self):
+        male = 0
+        female = 0
+        kid = 0
+        youth = 0
+        adult = 0
+        elderly = 0
+        total = 0
+
+        for p in self.game.players:
+
+            total = total + p.KPIs.lifetime_value
+            if p.Demographic.Gender == 'Male':
+                male = male + p.KPIs.lifetime_value
+
+            elif p.Demographic.Gender == 'Female':
+                female = female + p.KPIs.lifetime_value
+
+            
+            if p.Demographic.Age == 'Kid':
+                kid = kid + p.KPIs.lifetime_value
+            elif p.Demographic.Age == 'Youth':
+                youth = youth + p.KPIs.lifetime_value
+            elif p.Demographic.Age == 'Adult':
+                adult = adult + p.KPIs.lifetime_value
+            elif p.Demographic.Age == 'Elderly':
+                elderly = elderly + p.KPIs.lifetime_value
+
+        return total, male, female, kid, youth, adult, elderly
+            
 
 
 
@@ -115,12 +147,13 @@ class Analytics:
             player.KPIs.lifetime_value = player.KPIs.lifetime_value + purchase.GameObject.price
 
         #last moment and sessions
-        player.KPIs.lastLogIn = 365
+        player.KPIs.lastLogIn = 0000
         player.KPIs.sessions = 0
         if(len(player.KPIs.moments)>0):
             player.KPIs.sessions = player.KPIs.moments[-1].session
             date =  datetime.datetime(2021, 1, 21,0,0)
             player.KPIs.lastLogIn = (date - datetime.datetime.strptime(player.KPIs.moments[-1].time, '%Y-%m-%d %H:%M:%S')).total_seconds()/3600
+
         
         
 
@@ -128,6 +161,11 @@ class Analytics:
         player.KPIs.conversion_rate = 0
         if(len(player.KPIs.purchases) > 0):
             player.KPIs.conversion_rate = 1
+
+        player.KPIs.retention = False
+
+        if player.KPIs.sessions > 3:
+            player.KPIs.retention = True
 
         #hours-played~
         player.KPIs.playtime = self.measure_playtime(player.KPIs.moments)
@@ -144,6 +182,7 @@ class Analytics:
         self.KPIs.lastLogIn = 0
         self.KPIs.sessions = 0
         self.KPIs.conversion_rate = 0
+        self.KPIs.retention_n = 0
 
         for player in self.game.players:
             self.calc_kpi(player)
@@ -156,6 +195,9 @@ class Analytics:
             self.KPIs.lastLogIn =  self.KPIs.lastLogIn + player.KPIs.lastLogIn
             self.KPIs.sessions =  self.KPIs.sessions + player.KPIs.sessions
             self.KPIs.conversion_rate =  self.KPIs.conversion_rate + player.KPIs.conversion_rate
+
+            if player.KPIs.retention:
+                self.KPIs.retention_n = self.KPIs.retention_n + 1
         
         self.KPIs.distance_walked = self.KPIs.distance_walked/len(self.game.players)
         self.KPIs.challenge_success_rate = self.KPIs.challenge_success_rate/len(self.game.players)
@@ -163,6 +205,8 @@ class Analytics:
         self.KPIs.lastLogIn = self.KPIs.lastLogIn/len(self.game.players)
         self.KPIs.sessions = self.KPIs.sessions/len(self.game.players)
         self.KPIs.conversion_rate = self.KPIs.conversion_rate/len(self.game.players)
+        self.KPIs.retention = self.KPIs.retention_n/len(self.game.players)
+        
 
 
 

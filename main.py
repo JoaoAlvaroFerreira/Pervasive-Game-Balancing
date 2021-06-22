@@ -11,6 +11,7 @@ import sys
 from Controller.ML import *
 
 
+
 DB_PATH = "D:\\School\\5oAno\\TESE\\Repo\\Pervasive-Game-Balancing\\Databases\\games.db"
 
 def create_connection(path):
@@ -47,6 +48,13 @@ def print_all_players(conn):
     for row in cur:
         print("ID ",row[0])
         print("Name: ",row[1])
+    
+    print ("The End")
+
+def test(conn):
+    cur = conn.execute("SELECT COUNT(*) FROM Demographic WHERE Age == 'Youth';")
+    for row in cur:
+        print("ID ",row[0])
     
     print ("The End")
     
@@ -122,6 +130,7 @@ def full_ML():
     return "EARLY ANALYSIS SHOWS...:\n"+early_triggers + "\n POSITIVE RESULTS: \n"+ conclusion_max + "\n NEGATIVE RESULTS:\n" + conclusion_min
 
 
+
 def plot():
     game = GameManagement()
     connection = create_connection(DB_PATH)
@@ -132,7 +141,8 @@ def plotmap():
     game = GameManagement()
     connection = create_connection(DB_PATH)
     game.load(connection)
-    combined_plot(game.challenge_instances,game.gameplay_moments)    
+    plot_challenges(game.challenges)
+    #combined_plot(game.challenge_instances,game.gameplay_moments)    
 
 if __name__ == '__main__':
 
@@ -158,6 +168,12 @@ if __name__ == '__main__':
         game.load(connection)
         heatmap_moments(game.moments)    
         #plotplot()   
+
+    elif sys.argv[1] == 'test':
+        game = GameManagement()
+        connection = create_connection(DB_PATH)
+        game.load(connection)
+        test(connection)
 
     elif sys.argv[1] == "analyse":
         analyse()

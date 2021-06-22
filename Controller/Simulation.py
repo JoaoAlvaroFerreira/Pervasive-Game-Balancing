@@ -25,7 +25,7 @@ class Simulation:
         return a < probability
     
     def total_play(self,player):
-        player.base_motivation = random.uniform(0,5)
+        player.base_motivation = player.Personality.ClearGoals + player.Personality.SocialInteraction
         player.session = 0
         date =  datetime.datetime(2021, 1, 1,0,0)
         i = 0
@@ -104,7 +104,7 @@ class Simulation:
                                     self.gameplay_session(player,date)
                                     played_today = True
 
-                    if player.Demographic.Age == "Young" and hour > 8:
+                    if player.Demographic.Age == "Young" and hour > 10:
                         if weekend:
                             if player.base_motivation > 4:
                                 if self.decision(playval/10):

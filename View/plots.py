@@ -86,8 +86,8 @@ def heatmap_moments(moments):
     print("hello")
     print(len(moments))
 
-    LDN_COORDINATES = (40.2, -4)
-    myMap = folium.Map(location=LDN_COORDINATES, zoom_start=5)
+    LDN_COORDINATES = (41.15,-8.6)
+    myMap = folium.Map(location=LDN_COORDINATES, zoom_start=10)
 
     d = {'latitude': [], 'longitude': []}
     df_acc = pd.DataFrame(data=d)
@@ -157,21 +157,25 @@ def plotplot(players):
 def plot_challenges(challenges):
 
  
-    LDN_COORDINATES = (40.2, -4)
-    myMap = folium.Map(location=LDN_COORDINATES, zoom_start=5)
+    LDN_COORDINATES = (40,-8.7187)
+    myMap = folium.Map(location=LDN_COORDINATES, zoom_start=15)
 
-  
+    print("b")
+    print(len(challenges))
+    print("c")
     # Add marker for Boulder, CO
     for challenge in challenges:
-        folium.Marker(
-            location=[challenge.latitude, challenge.longitude], # coordinates for the marker (Earth Lab at CU Boulder)
-            popup='Challenge', # pop-up label for the marker
-            icon=folium.Icon()
-        ).add_to(myMap)
+        
+        if challenge.latitude > 41.2 and challenge.longitude > -8.4:
+            folium.Marker(
+                location=[challenge.latitude, challenge.longitude], # coordinates for the marker (Earth Lab at CU Boulder)
+                popup='Challenge', # pop-up label for the marker
+                icon=folium.Icon()
+            ).add_to(myMap)
 
 
-    myMap.save("challenge_map.html")
-    webbrowser.open("challenge_map.html")
+    myMap.save("map.html")
+    webbrowser.open("map.html")
 
 def combined_plot(challenges, moments):
 

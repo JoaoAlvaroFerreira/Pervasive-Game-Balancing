@@ -184,7 +184,7 @@ class GameManagement:
     def generatePlayers(self):
         self.players = []
 
-        for _ in range(1000):
+        for _ in range(10):
             self.players.extend(playgen.generatePlayer())
 
         

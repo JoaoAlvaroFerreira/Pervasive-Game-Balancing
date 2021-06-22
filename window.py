@@ -20,7 +20,7 @@ def plotTest():
 
        
        kid = []
-       
+       young = []
        adult = []
        elderly = []
 
@@ -31,9 +31,11 @@ def plotTest():
                adult.append(ch)
            elif ch.player.Demographic.Age == "Elderly":
                elderly.append(ch)
+           else:
+               young.append(ch)
        
-       return {'Age': ['Kid','Adult','Elderly'],
-         'Challenges Completed': [len(kid), len(adult), len(elderly)]
+       return {'Age': ['Kid','Adult','Elderly','Young'],
+         'Challenges Completed': [len(kid), len(adult), len(elderly), len(young)]
         }
 
 
